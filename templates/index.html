@@ -2,40 +2,62 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Controle de Coletas</title>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-  <h1>📦 Controle de Coletas</h1>
+  <!-- Página principal: bipagem atual -->
+  <div id="pagina-bipagem" class="pagina ativa">
+    <h1>📦 Bipagem Atual</h1>
 
-  <div id="form">
-    <select id="motorista">
-      <option value="">Selecione o motorista</option>
-      <option value="Silenildo">Silenildo</option>
-      <option value="Adryen">Adryen</option>
-      <option value="Priscila">Priscila</option>
-      <option value="Uelber">Uelber</option>
-      <option value="Luiz Carlos">Luiz Carlos</option>
-      <option value="Luis Gerson">Luis Gerson</option>
-      <option value="Marcio">Marcio</option>
-      <option value="Dayveson">Dayveson</option>
-      <option value="Dalvan">Dalvan</option>
-    </select>
+    <div id="form">
+      <select id="motorista">
+        <option value="">Selecione o motorista</option>
+        <option value="Silenildo">Silenildo</option>
+        <option value="Adryen">Adryen</option>
+        <option value="Priscila">Priscila</option>
+        <option value="Uelber">Uelber</option>
+        <option value="Luiz Carlos">Luiz Carlos</option>
+        <option value="Luis Gerson">Luis Gerson</option>
+        <option value="Marcio">Marcio</option>
+        <option value="Dayveson">Dayveson</option>
+        <option value="Dalvan">Dalvan</option>
+      </select>
 
-    <input type="text" id="loja" placeholder="Número da Loja" />
-    <input type="text" id="codigo" placeholder="Bipe o código" autofocus />
-    <button onclick="adicionarCodigo()">Adicionar</button>
+      <input type="text" id="loja" placeholder="Número da Loja" />
+      <input type="text" id="codigo" placeholder="Bipe o código" autofocus />
+      <button onclick="adicionarCodigo()">Adicionar</button>
+    </div>
+
+    <p id="mensagem"></p>
+    <h2>Bipagem Atual: <span id="contador">0</span> pedidos</h2>
+    <ul id="bipagemAtual"></ul>
+
+    <button onclick="registrarBipagem()">Registrar Bipagem</button>
+    <button onclick="abrirMenu()">Menu</button>
   </div>
 
-  <p id="mensagem"></p>
-  <h2>Bipagem Atual: <span id="contador">0</span> pedidos</h2>
-  <ul id="bipagemAtual"></ul>
+  <!-- Página menu -->
+  <div id="pagina-menu" class="pagina">
+    <h1>Menu</h1>
+    <button onclick="abrirHistorico()">Histórico</button>
+    <button onclick="exportarBackup()">Exportar Backup</button>
+    <button onclick="voltarBipagem()">Voltar</button>
+  </div>
 
-  <button onclick="registrarBipagem()">Registrar Bipagem</button>
-
-  <h2>Menu</h2>
-  <button onclick="abrirHistorico()">Histórico</button>
-  <button onclick="exportarBackup()">Exportar Backup</button>
+  <!-- Página histórico -->
+  <div id="pagina-historico" class="pagina">
+    <h1>Histórico de Coletas</h1>
+    <div id="filtros">
+      <input type="text" id="filtrar-motorista" placeholder="Filtrar por motorista" />
+      <input type="text" id="filtrar-loja" placeholder="Filtrar por loja" />
+      <input type="date" id="filtrar-data" />
+      <button onclick="aplicarFiltros()">Filtrar</button>
+    </div>
+    <ul id="historico-lista"></ul>
+    <button onclick="voltarMenu()">Voltar</button>
+  </div>
 
   <script src="/static/script.js"></script>
 </body>
