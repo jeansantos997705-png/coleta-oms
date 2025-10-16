@@ -9,33 +9,36 @@
 <body>
   <h1>📦 Controle de Coletas</h1>
 
-  <div id="form">
-    <select id="motorista">
-      <option value="">Selecione o motorista</option>
-      <option>Silenildo</option>
-      <option>Adryen</option>
-      <option>Priscila</option>
-      <option>Uelber</option>
-      <option>Luiz Carlos</option>
-      <option>Luis Gerson</option>
-      <option>Marcio</option>
-      <option>Dayveson</option>
-      <option>Dalvan</option>
-    </select>
-    <input type="text" id="loja" placeholder="Número da loja" />
-    <input type="text" id="codigo" placeholder="Bipe o código" autofocus />
-    <button onclick="adicionarCodigo()">Adicionar</button>
-    <button onclick="registrarTudo()">Registrar</button>
-    <button onclick="abrirMenu()">Menu</button>
+  <!-- Tela principal de bipagem -->
+  <div id="mainScreen">
+    <div id="form">
+      <select id="motorista">
+        <option value="">Selecione o motorista</option>
+        <option>Silenildo</option>
+        <option>Adryen</option>
+        <option>Priscila</option>
+        <option>Uelber</option>
+        <option>Luiz Carlos</option>
+        <option>Luis Gerson</option>
+        <option>Marcio</option>
+        <option>Dayveson</option>
+        <option>Dalvan</option>
+      </select>
+      <input type="text" id="loja" placeholder="Número da loja" />
+      <input type="text" id="codigo" placeholder="Bipe o código" autofocus />
+      <button onclick="adicionarCodigo()">Adicionar</button>
+      <button onclick="registrarTudo()">Registrar</button>
+      <button onclick="abrirMenu()">Menu</button>
+    </div>
+
+    <p id="mensagem"></p>
+
+    <h2>Bipagem Atual (<span id="contador">0</span>)</h2>
+    <ul id="bipagemAtual"></ul>
   </div>
 
-  <p id="mensagem"></p>
-
-  <h2>Bipagem Atual (<span id="contador">0</span>)</h2>
-  <ul id="bipagemAtual"></ul>
-
-  <!-- Tela flutuante do menu -->
-  <div id="menu" class="overlay" style="display:none;">
+  <!-- Tela de menu -->
+  <div id="menuScreen" class="overlay" style="display:none;">
     <div class="overlayContent">
       <button onclick="fecharMenu()" class="fechar">Fechar ✖</button>
       <h2>Menu</h2>
@@ -44,7 +47,7 @@
   </div>
 
   <!-- Tela de histórico -->
-  <div id="historicoSec" class="overlay" style="display:none;">
+  <div id="historicoScreen" class="overlay" style="display:none;">
     <div class="overlayContent">
       <button onclick="fecharHistorico()" class="fechar">Voltar ✖</button>
       <h2>Histórico de Pedidos</h2>

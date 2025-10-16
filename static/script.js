@@ -63,23 +63,26 @@ async function registrarTudo() {
     atualizarHistorico();
 }
 
-// Menu e histórico
+// Controle do menu
 function abrirMenu() {
-    document.getElementById("menu").style.display = "block";
+    document.getElementById("mainScreen").style.display = "none";
+    document.getElementById("menuScreen").style.display = "block";
 }
 
 function fecharMenu() {
-    document.getElementById("menu").style.display = "none";
+    document.getElementById("menuScreen").style.display = "none";
+    document.getElementById("mainScreen").style.display = "block";
 }
 
 function abrirHistorico() {
-    fecharMenu();
-    document.getElementById("historicoSec").style.display = "block";
+    document.getElementById("menuScreen").style.display = "none";
+    document.getElementById("historicoScreen").style.display = "block";
     atualizarHistorico();
 }
 
 function fecharHistorico() {
-    document.getElementById("historicoSec").style.display = "none";
+    document.getElementById("historicoScreen").style.display = "none";
+    document.getElementById("mainScreen").style.display = "block";
 }
 
 async function atualizarHistorico() {
@@ -94,7 +97,7 @@ async function atualizarHistorico() {
     });
 }
 
-// Adiciona enter para adicionar código
+// Enter adiciona código
 document.getElementById("codigo").addEventListener("keyup", function(event) {
     if (event.key === "Enter") {
         adicionarCodigo();
