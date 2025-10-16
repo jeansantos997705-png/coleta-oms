@@ -1,70 +1,42 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Controle de Coletas</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8" />
+  <title>Controle de Coletas</title>
+  <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-    <header>
-        <h1>📦 Coletas - Bipagem Atual</h1>
-        <button id="abrirMenu">Menu</button>
-    </header>
+  <h1>📦 Controle de Coletas</h1>
 
-    <main id="telaPrincipal">
-        <div id="formBipagem">
-            <label for="motorista">Motorista:</label>
-            <select id="motorista">
-                <option value="">Selecione</option>
-                <option value="Silenildo">Silenildo</option>
-                <option value="Adryen">Adryen</option>
-                <option value="Priscila">Priscila</option>
-                <option value="Uelber">Uelber</option>
-                <option value="Luiz Carlos">Luiz Carlos</option>
-                <option value="Luis Gerson">Luis Gerson</option>
-                <option value="Marcio">Marcio</option>
-                <option value="Dayveson">Dayveson</option>
-                <option value="Dalvan">Dalvan</option>
-            </select>
+  <div id="form">
+    <select id="motorista">
+      <option value="">Selecione o motorista</option>
+      <option value="Silenildo">Silenildo</option>
+      <option value="Adryen">Adryen</option>
+      <option value="Priscila">Priscila</option>
+      <option value="Uelber">Uelber</option>
+      <option value="Luiz Carlos">Luiz Carlos</option>
+      <option value="Luis Gerson">Luis Gerson</option>
+      <option value="Marcio">Marcio</option>
+      <option value="Dayveson">Dayveson</option>
+      <option value="Dalvan">Dalvan</option>
+    </select>
 
-            <label for="loja">Loja:</label>
-            <input type="text" id="loja" placeholder="Número da loja">
+    <input type="text" id="loja" placeholder="Número da Loja" />
+    <input type="text" id="codigo" placeholder="Bipe o código" autofocus />
+    <button onclick="adicionarCodigo()">Adicionar</button>
+  </div>
 
-            <label for="codigo">Bipe o código:</label>
-            <input type="text" id="codigo" placeholder="Código do pedido" maxlength="12">
+  <p id="mensagem"></p>
+  <h2>Bipagem Atual: <span id="contador">0</span> pedidos</h2>
+  <ul id="bipagemAtual"></ul>
 
-            <button id="adicionar">Adicionar</button>
-            <button id="registrar">Registrar Coleta</button>
-        </div>
+  <button onclick="registrarBipagem()">Registrar Bipagem</button>
 
-        <div id="bipagemAtual">
-            <h2>Bipagem Atual</h2>
-            <ul id="listaBipada"></ul>
-            <p id="mensagem"></p>
-        </div>
-    </main>
+  <h2>Menu</h2>
+  <button onclick="abrirHistorico()">Histórico</button>
+  <button onclick="exportarBackup()">Exportar Backup</button>
 
-    <!-- Menu flutuante -->
-    <div id="menu" class="oculto">
-        <button id="fecharMenu">Fechar</button>
-        <h2>Menu</h2>
-        <button id="abrirHistorico">Histórico</button>
-        <button id="exportarBackup">Exportar Backup</button>
-    </div>
-
-    <!-- Página de histórico -->
-    <div id="paginaHistorico" class="oculto">
-        <button id="voltarMenu">Voltar</button>
-        <h2>Histórico de Coletas</h2>
-        <ul id="listaHistorico"></ul>
-        <div id="detalhesColeta" class="oculto">
-            <h3>Detalhes da Coleta</h3>
-            <ul id="pedidosColeta"></ul>
-            <button id="copiarPedidos">Copiar Pedidos</button>
-            <button id="fecharDetalhes">Fechar</button>
-        </div>
-    </div>
-
-    <script src="/static/script.js"></script>
+  <script src="/static/script.js"></script>
 </body>
 </html>

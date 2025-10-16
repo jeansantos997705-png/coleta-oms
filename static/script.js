@@ -1,112 +1,84 @@
 let bipagemAtual = [];
-const listaBipada = document.getElementById("listaBipada");
-const mensagem = document.getElementById("mensagem");
-const codigoInput = document.getElementById("codigo");
-const motoristaInput = document.getElementById("motorista");
-const lojaInput = document.getElementById("loja");
 
-const menu = document.getElementById("menu");
-const abrirMenuBtn = document.getElementById("abrirMenu");
-const fecharMenuBtn = document.getElementById("fecharMenu");
-const abrirHistoricoBtn = document.getElementById("abrirHistorico");
-const exportarBackupBtn = document.getElementById("exportarBackup");
+function atualizarListaBipagem() {
+    const lista = document.getElementById("bipagemAtual");
+    lista.innerHTML = "";
+    bipagemAtual.forEach((item) => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        lista.appendChild(li);
+    });
+    document.getElementById("contador").innerText = bipagemAtual.length;
+}
 
-const paginaHistorico = document.getElementById("paginaHistorico");
-const voltarMenuBtn = document.getElementById("voltarMenu");
-const listaHistorico = document.getElementById("listaHistorico");
-const detalhesColeta = document.getElementById("detalhesColeta");
-const pedidosColeta = document.getElementById("pedidosColeta");
-const copiarPedidosBtn = document.getElementById("copiarPedidos");
-const fecharDetalhesBtn = document.getElementById("fecharDetalhes");
-
-// --- Funções bipagem ---
-document.getElementById("adicionar").onclick = () => {
+function adicionarCodigo() {
+    const codigoInput = document.getElementById("codigo");
     const codigo = codigoInput.value.trim();
-    if (!codigo) return;
-    bipagemAtual.push(codigo);
-    atualizarListaBipada();
-    codigoInput.value = "";
-};
+    const msg = document.getElementById("mensagem");
 
-document.getElementById("registrar").onclick = async () => {
-    const motorista = motoristaInput.value;
-    const loja = lojaInput.value;
-    if (!motorista || !loja || bipagemAtual.length === 0) {
-        mensagem.innerText = "Preencha motorista, loja e adicione códigos!";
+    if (!codigo) {
+        msg.innerText = "Digite ou bip um código!";
         return;
     }
 
-    const resp = await fetch("/registrar", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ motorista, loja, codigos: bipagemAtual }),
-    });
-    const data = await resp.json();
-    mensagem.innerText = data.mensagem;
+    if (codigo.length !== 12 || codigo[9] !== '-') { // Exemplo: 12 caracteres com traço na posição 10
+        msg.innerText = "Código inválido! Deve ter 12 caracteres e incluir o traço.";
+        codigoInput.value = "";
+        return;
+    }
+
+    if (bipagemAtual.includes(codigo)) {
+        msg.innerText = `Código ${codigo} já adicionado na bipagem atual!`;
+        codigoInput.value = "";
+        return;
+    }
+
+    bipagemAtual.push(codigo);
+    msg.innerText = `Código ${codigo} adicionado na bipagem atual.`;
+    codigoInput.value = "";
+    atualizarListaBipagem();
+}
+
+// Permite adicionar o código ao pressionar Enter
+document.getElementById("codigo").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        adicionarCodigo();
+    }
+});
+
+async function registrarBipagem() {
+    const motorista = document.getElementById("motorista").value.trim();
+    const loja = document.getElementById("loja").value.trim();
+    const msg = document.getElementById("mensagem");
+
+    if (!motorista || !loja) {
+        msg.innerText = "Selecione o motorista e informe a loja!";
+        return;
+    }
+
+    if (bipagemAtual.length === 0) {
+        msg.innerText = "Nenhum código na bipagem atual!";
+        return;
+    }
+
+    for (let codigo of bipagemAtual) {
+        await fetch("/registrar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ motorista, loja, codigo }),
+        });
+    }
+
     bipagemAtual = [];
-    atualizarListaBipada();
-};
-
-function atualizarListaBipada() {
-    listaBipada.innerHTML = "";
-    bipagemAtual.forEach(c => {
-        const li = document.createElement("li");
-        li.textContent = c;
-        listaBipada.appendChild(li);
-    });
+    atualizarListaBipagem();
+    msg.innerText = "Bipagem registrada com sucesso!";
 }
 
-// --- Menu ---
-abrirMenuBtn.onclick = () => menu.classList.remove("oculto");
-fecharMenuBtn.onclick = () => menu.classList.add("oculto");
-abrirHistoricoBtn.onclick = () => {
-    menu.classList.add("oculto");
-    paginaHistorico.classList.remove("oculto");
-    carregarHistorico();
-};
-voltarMenuBtn.onclick = () => paginaHistorico.classList.add("oculto");
-
-// --- Histórico ---
-async function carregarHistorico() {
-    const resp = await fetch("/listar");
-    const dados = await resp.json();
-    listaHistorico.innerHTML = "";
-    dados.slice().reverse().forEach((item, index) => {
-        const li = document.createElement("li");
-        li.textContent = `${item.data} - ${item.motorista} - Loja: ${item.loja} (${item.codigos.length} pedidos)`;
-        li.style.cursor = "pointer";
-        li.onclick = () => abrirDetalhes(item);
-        listaHistorico.appendChild(li);
-    });
+// Funções placeholder
+function abrirHistorico() {
+    alert("Aqui abrirá o histórico de coletas.");
 }
 
-function abrirDetalhes(coleta) {
-    detalhesColeta.classList.remove("oculto");
-    pedidosColeta.innerHTML = "";
-    coleta.codigos.forEach(c => {
-        const li = document.createElement("li");
-        li.textContent = c;
-        pedidosColeta.appendChild(li);
-    });
+function exportarBackup() {
+    alert("Aqui você exporta o backup em Excel.");
 }
-
-function fecharDetalhes() {
-    detalhesColeta.classList.add("oculto");
-}
-
-copiarPedidosBtn.onclick = () => {
-    const textos = Array.from(pedidosColeta.children).map(li => li.textContent).join("\n");
-    navigator.clipboard.writeText(textos);
-    alert("Pedidos copiados!");
-};
-
-exportarBackupBtn.onclick = async () => {
-    const resp = await fetch("/backup");
-    const blob = await resp.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `backup_pedidos.xlsx`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-};
