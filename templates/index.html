@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Controle de Coletas</title>
-  <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8" />
+  <title>📦 Controle de Coletas</title>
+  <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
   <h1>📦 Controle de Coletas</h1>
@@ -12,38 +11,52 @@
   <div id="form">
     <select id="motorista">
       <option value="">Selecione o motorista</option>
-      <option>Silenildo</option>
-      <option>Adryen</option>
-      <option>Priscila</option>
-      <option>Uelber</option>
-      <option>Luiz Carlos</option>
-      <option>Luis Gerson</option>
-      <option>Marcio</option>
-      <option>Dayveson</option>
-      <option>Dalvan</option>
+      <option value="Silenildo">Silenildo</option>
+      <option value="Adryen">Adryen</option>
+      <option value="Priscila">Priscila</option>
+      <option value="Uelber">Uelber</option>
+      <option value="Luiz Carlos">Luiz Carlos</option>
+      <option value="Luis Gerson">Luis Gerson</option>
+      <option value="Marcio">Marcio</option>
+      <option value="Dayveson">Dayveson</option>
+      <option value="Dalvan">Dalvan</option>
     </select>
-    <input type="text" id="loja" placeholder="Número da loja">
-    <input type="text" id="codigo" placeholder="Bipe o código" autofocus>
-    <button onclick="adicionarBipagem()">Adicionar bipagem</button>
+    <input type="text" id="loja" placeholder="Loja" />
+    <input type="text" id="codigo" placeholder="Bipe o código" autofocus />
     <button onclick="registrar()">Registrar</button>
   </div>
 
   <p id="mensagem"></p>
 
-  <div style="display:flex; flex-direction:row; gap:20px; flex-wrap:wrap;">
-    <div style="flex:1;">
-      <h2>Coletas da sessão</h2>
-      <ul id="bipagemAtual"></ul>
+  <div id="container">
+    <div id="coleta-atual">
+      <h2>Coleta Atual</h2>
+      <ul id="lista-atual"></ul>
+      <p>Total: <span id="contador">0</span></p>
     </div>
 
-    <div style="flex:1;">
-      <h2>Menu</h2>
-      <button onclick="toggleMenu()">Abrir/Fechar Menu</button>
-      <div id="menu" style="display:none; margin-top:10px;">
-        <button onclick="baixarBackup()">Backup Excel</button>
-        <a href="/historico" target="_blank"><button>Histórico</button></a>
+    <div id="menu">
+      <button id="menu-btn" onclick="toggleMenu()">☰ Menu</button>
+      <div id="menu-content">
+        <h2>Menu</h2>
+        <button onclick="abrirHistorico()">Histórico</button>
+        <button onclick="fazerBackup()">Backup Excel</button>
       </div>
     </div>
+  </div>
+
+  <div id="historico" style="display:none">
+    <h2>Histórico de Coletas</h2>
+    <div>
+      <label>Motorista: </label>
+      <input type="text" id="filtro-motorista" oninput="filtrarHistorico()" />
+      <label>Loja: </label>
+      <input type="text" id="filtro-loja" oninput="filtrarHistorico()" />
+      <label>Data: </label>
+      <input type="date" id="filtro-data" onchange="filtrarHistorico()" />
+    </div>
+    <ul id="lista-historico"></ul>
+    <button onclick="fecharHistorico()">Fechar Histórico</button>
   </div>
 
   <script src="/static/script.js"></script>

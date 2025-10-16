@@ -1,97 +1,51 @@
-/* --- Estilo geral --- */
 body {
-  font-family: Arial, sans-serif;
-  margin: 20px;
-  background: #fff;
-  color: #333;
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background: #fff;
+    color: #333;
 }
 
-/* --- Título --- */
-h1 {
-  color: #d32f2f; /* vermelho */
-  text-align: center;
-  margin-bottom: 20px;
+h1, h2 {
+    color: #b71c1c;
 }
 
-/* --- Formulário --- */
-#form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin-bottom: 20px;
+#form input, #form select, #form button {
+    padding: 10px;
+    margin-right: 5px;
+    margin-bottom: 5px;
 }
 
-input, select, button {
-  padding: 10px;
-  font-size: 1rem;
-  border-radius: 5px;
-  border: 1px solid #d32f2f;
-}
-
-input, select {
-  flex: 1 1 150px;
-}
-
-button {
-  background-color: #d32f2f;
-  color: white;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-button:hover {
-  background-color: #b71c1c;
-}
-
-/* --- Mensagem --- */
 #mensagem {
-  font-weight: bold;
-  margin-top: 10px;
-  text-align: center;
+    font-weight: bold;
+    margin-top: 10px;
 }
 
-/* --- Listas --- */
-ul {
-  list-style-type: none;
-  padding: 0;
+#container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+#coleta-atual, #menu {
+    border: 1px solid #b71c1c;
+    padding: 15px;
+    border-radius: 5px;
+    background: #fff;
+}
+
+#menu-content {
+    display: none;
+    margin-top: 10px;
+}
+
+#menu-content button {
+    display: block;
+    margin-bottom: 5px;
 }
 
 li {
-  background: #f4f4f4;
-  margin-bottom: 5px;
-  padding: 8px;
-  border-radius: 5px;
-  border-left: 5px solid #d32f2f;
-  word-wrap: break-word;
-}
-
-/* --- Layout das colunas --- */
-div[style*="display:flex"] {
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-div[style*="flex:1"] {
-  background: #fff;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  min-width: 250px;
-}
-
-/* --- Menu --- */
-#menu button {
-  width: 100%;
-  margin-top: 5px;
-}
-
-/* --- Responsivo --- */
-@media (max-width: 600px) {
-  #form {
-    flex-direction: column;
-  }
-  div[style*="display:flex"] {
-    flex-direction: column;
-  }
+    background: #f1f1f1;
+    margin-bottom: 4px;
+    padding: 8px;
+    border-radius: 5px;
 }
