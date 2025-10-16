@@ -8,7 +8,7 @@
 </head>
 <body>
   <header>
-    <h1>📦 Controle de Coletas</h1>
+    <h1>📦OMS</h1>
     <button id="menuBtn">☰</button>
   </header>
 
@@ -33,10 +33,10 @@
     </select>
 
     <label>Loja:</label>
-    <input type="text" id="loja" placeholder="Número da loja" />
+    <input type="text" id="loja" placeholder="Loja" />
 
     <label>Bipagem:</label>
-    <input type="text" id="codigo" placeholder="Bipe o código" autofocus onkeypress="if(event.key==='Enter'){adicionarBipagem();}" />
+    <input type="text" id="codigo" placeholder="Pedido" autofocus onkeypress="if(event.key==='Enter'){adicionarBipagem();}" />
     <button onclick="registrarColeta()">Registrar Coleta</button>
 
     <p id="mensagem"></p>
