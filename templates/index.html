@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>📦 Controle de Coletas</title>
+  <title>Controle de Coletas</title>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
@@ -21,42 +21,22 @@
       <option value="Dayveson">Dayveson</option>
       <option value="Dalvan">Dalvan</option>
     </select>
-    <input type="text" id="loja" placeholder="Loja" />
+    <input type="text" id="loja" placeholder="Número da loja" />
     <input type="text" id="codigo" placeholder="Bipe o código" autofocus />
     <button onclick="registrar()">Registrar</button>
   </div>
 
   <p id="mensagem"></p>
 
-  <div id="container">
-    <div id="coleta-atual">
-      <h2>Coleta Atual</h2>
+  <div id="container-listas">
+    <div id="bipagem-atual">
+      <h2>📝 Bipagem Atual (<span id="contagem">0</span>)</h2>
       <ul id="lista-atual"></ul>
-      <p>Total: <span id="contador">0</span></p>
     </div>
-
-    <div id="menu">
-      <button id="menu-btn" onclick="toggleMenu()">☰ Menu</button>
-      <div id="menu-content">
-        <h2>Menu</h2>
-        <button onclick="abrirHistorico()">Histórico</button>
-        <button onclick="fazerBackup()">Backup Excel</button>
-      </div>
+    <div id="historico">
+      <h2>Histórico</h2>
+      <ul id="lista"></ul>
     </div>
-  </div>
-
-  <div id="historico" style="display:none">
-    <h2>Histórico de Coletas</h2>
-    <div>
-      <label>Motorista: </label>
-      <input type="text" id="filtro-motorista" oninput="filtrarHistorico()" />
-      <label>Loja: </label>
-      <input type="text" id="filtro-loja" oninput="filtrarHistorico()" />
-      <label>Data: </label>
-      <input type="date" id="filtro-data" onchange="filtrarHistorico()" />
-    </div>
-    <ul id="lista-historico"></ul>
-    <button onclick="fecharHistorico()">Fechar Histórico</button>
   </div>
 
   <script src="/static/script.js"></script>

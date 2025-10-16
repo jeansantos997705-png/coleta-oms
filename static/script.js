@@ -1,4 +1,49 @@
-let coletaAtual = [];
+let bipagemAtual = [];
+
+document.getElementById("codigo").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        adicionarBipagem();
+    }
+});
+
+function adicionarBipagem() {
+    const codigoInput = document.getElementById("codigo");
+    const codigo = codigoInput.value.trim();
+    const msg = document.getElementById("mensagem");
+
+    if (!codigo) {
+        msg.innerText = "Digite ou bip o código!";
+        return;
+    }
+
+    if (codigo.length !== 12 || !codigo.includes("-")) {
+        msg.innerText = "Código inválido! Deve ter 12 caracteres incluindo o traço.";
+        codigoInput.value = "";
+        return;
+    }
+
+    if (bipagemAtual.includes(codigo)) {
+        msg.innerText = `Código ${codigo} já foi bipado nesta coleta!`;
+        codigoInput.value = "";
+        return;
+    }
+
+    bipagemAtual.push(codigo);
+    atualizarListaAtual();
+    msg.innerText = `Código ${codigo} adicionado.`;
+    codigoInput.value = "";
+}
+
+function atualizarListaAtual() {
+    const lista = document.getElementById("lista-atual");
+    lista.innerHTML = "";
+    bipagemAtual.forEach((codigo) => {
+        const li = document.createElement("li");
+        li.textContent = codigo;
+        lista.appendChild(li);
+    });
+    document.getElementById("contagem").innerText = bipagemAtual.length;
+}
 
 async function registrar() {
     const motorista = document.getElementById("motorista").value.trim();
@@ -6,75 +51,39 @@ async function registrar() {
     const msg = document.getElementById("mensagem");
 
     if (!motorista || !loja) {
-        msg.innerText = "Preencha motorista e loja!";
+        msg.innerText = "Selecione o motorista e preencha a loja!";
         return;
     }
 
-    if (coletaAtual.length === 0) {
+    if (bipagemAtual.length === 0) {
         msg.innerText = "Nenhum código para registrar!";
         return;
     }
 
-    // Enviar todos os códigos de uma vez
-    const resp = await fetch("/registrar-multiple", {
+    const resp = await fetch("/registrar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ motorista, loja, codigos: coletaAtual })
+        body: JSON.stringify({ motorista, loja, codigos: bipagemAtual }),
     });
 
     const data = await resp.json();
     msg.innerText = data.mensagem;
 
-    // Limpar coleta atual
-    coletaAtual = [];
+    bipagemAtual = [];
     atualizarListaAtual();
-    document.getElementById("contador").innerText = 0;
+    atualizarHistorico();
 }
 
-function toggleMenu() {
-    const menuContent = document.getElementById("menu-content");
-    menuContent.style.display = menuContent.style.display === "block" ? "none" : "block";
-}
-
-function atualizarListaAtual() {
-    const lista = document.getElementById("lista-atual");
+async function atualizarHistorico() {
+    const resp = await fetch("/listar");
+    const dados = await resp.json();
+    const lista = document.getElementById("lista");
     lista.innerHTML = "";
-    coletaAtual.forEach(c => {
+    dados.slice(0, 10).forEach((item) => {
         const li = document.createElement("li");
-        li.textContent = c;
+        li.textContent = `${item.data} - ${item.motorista} - Loja: ${item.loja} (${item.codigos.length} pedidos)`;
         lista.appendChild(li);
     });
-    document.getElementById("contador").innerText = coletaAtual.length;
 }
 
-document.getElementById("codigo").addEventListener("keypress", function(e) {
-    if (e.key === "Enter") {
-        const codigo = this.value.trim();
-        if (!codigo) return;
-
-        if (coletaAtual.includes(codigo)) {
-            alert("Código duplicado na coleta atual!");
-        } else {
-            coletaAtual.push(codigo);
-            atualizarListaAtual();
-        }
-        this.value = "";
-    }
-});
-
-// Histórico e backup (exemplo)
-function abrirHistorico() {
-    document.getElementById("historico").style.display = "block";
-}
-
-function fecharHistorico() {
-    document.getElementById("historico").style.display = "none";
-}
-
-function filtrarHistorico() {
-    // Função para filtrar histórico futuramente
-}
-
-function fazerBackup() {
-    alert("Backup em Excel será implementado via servidor");
-}
+setInterval(atualizarHistorico, 3000);

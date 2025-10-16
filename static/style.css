@@ -2,17 +2,33 @@ body {
     font-family: Arial, sans-serif;
     margin: 20px;
     background: #fff;
-    color: #333;
+    color: #000;
 }
 
-h1, h2 {
-    color: #b71c1c;
+h1 {
+    color: #c00; /* vermelho principal */
 }
 
-#form input, #form select, #form button {
+#form {
+    margin-bottom: 15px;
+}
+
+input, button, select {
     padding: 10px;
     margin-right: 5px;
-    margin-bottom: 5px;
+    font-size: 16px;
+}
+
+button {
+    background-color: #c00;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #900;
 }
 
 #mensagem {
@@ -20,32 +36,29 @@ h1, h2 {
     margin-top: 10px;
 }
 
-#container {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-}
-
-#coleta-atual, #menu {
-    border: 1px solid #b71c1c;
-    padding: 15px;
-    border-radius: 5px;
-    background: #fff;
-}
-
-#menu-content {
-    display: none;
-    margin-top: 10px;
-}
-
-#menu-content button {
-    display: block;
-    margin-bottom: 5px;
+ul {
+    list-style: none;
+    padding: 0;
 }
 
 li {
-    background: #f1f1f1;
+    background: #f4f4f4;
     margin-bottom: 4px;
     padding: 8px;
     border-radius: 5px;
+}
+
+#container-listas {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+#bipagem-atual, #historico {
+    flex: 1;
+    min-width: 250px;
+}
+
+h2 {
+    color: #c00;
 }
