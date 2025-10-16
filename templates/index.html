@@ -1,53 +1,70 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>Controle de Coletas</title>
-  <link rel="stylesheet" href="/static/style.css" />
+    <meta charset="UTF-8">
+    <title>Controle de Coletas</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <header>
-    <h1>📦 Controle de Coletas</h1>
-    <button id="menu-btn">☰ Menu</button>
-    <nav id="menu">
-      <ul>
-        <li><a href="#" onclick="abrirBipagemAtual()">Bipagem Atual</a></li>
-        <li><a href="#" onclick="abrirHistorico()">Histórico</a></li>
-      </ul>
-    </nav>
-  </header>
+    <header>
+        <h1>📦 Coletas - Bipagem Atual</h1>
+        <button id="abrirMenu">Menu</button>
+    </header>
 
-  <main>
-    <section id="form-section">
-      <select id="motorista">
-        <option value="">Selecione o motorista</option>
-        <option value="Silenildo">Silenildo</option>
-        <option value="Adryen">Adryen</option>
-        <option value="Priscila">Priscila</option>
-        <option value="Uelber">Uelber</option>
-        <option value="Luiz Carlos">Luiz Carlos</option>
-        <option value="Luis Gerson">Luis Gerson</option>
-        <option value="Marcio">Marcio</option>
-        <option value="Dayveson">Dayveson</option>
-        <option value="Dalvan">Dalvan</option>
-      </select>
-      <input type="text" id="loja" placeholder="Número da loja" />
-      <input type="text" id="codigo" placeholder="Bipe o código" autofocus />
-      <button onclick="registrar()">Registrar</button>
-      <p id="mensagem"></p>
-    </section>
+    <main id="telaPrincipal">
+        <div id="formBipagem">
+            <label for="motorista">Motorista:</label>
+            <select id="motorista">
+                <option value="">Selecione</option>
+                <option value="Silenildo">Silenildo</option>
+                <option value="Adryen">Adryen</option>
+                <option value="Priscila">Priscila</option>
+                <option value="Uelber">Uelber</option>
+                <option value="Luiz Carlos">Luiz Carlos</option>
+                <option value="Luis Gerson">Luis Gerson</option>
+                <option value="Marcio">Marcio</option>
+                <option value="Dayveson">Dayveson</option>
+                <option value="Dalvan">Dalvan</option>
+            </select>
 
-    <section id="bipagem-atual-section" class="oculto">
-      <h2>📝 Bipagem Atual (<span id="contagem">0</span>)</h2>
-      <ul id="lista-atual"></ul>
-    </section>
+            <label for="loja">Loja:</label>
+            <input type="text" id="loja" placeholder="Número da loja">
 
-    <section id="historico-section" class="oculto">
-      <h2>📋 Histórico</h2>
-      <ul id="lista"></ul>
-    </section>
-  </main>
+            <label for="codigo">Bipe o código:</label>
+            <input type="text" id="codigo" placeholder="Código do pedido" maxlength="12">
 
-  <script src="/static/script.js"></script>
+            <button id="adicionar">Adicionar</button>
+            <button id="registrar">Registrar Coleta</button>
+        </div>
+
+        <div id="bipagemAtual">
+            <h2>Bipagem Atual</h2>
+            <ul id="listaBipada"></ul>
+            <p id="mensagem"></p>
+        </div>
+    </main>
+
+    <!-- Menu flutuante -->
+    <div id="menu" class="oculto">
+        <button id="fecharMenu">Fechar</button>
+        <h2>Menu</h2>
+        <button id="abrirHistorico">Histórico</button>
+        <button id="exportarBackup">Exportar Backup</button>
+    </div>
+
+    <!-- Página de histórico -->
+    <div id="paginaHistorico" class="oculto">
+        <button id="voltarMenu">Voltar</button>
+        <h2>Histórico de Coletas</h2>
+        <ul id="listaHistorico"></ul>
+        <div id="detalhesColeta" class="oculto">
+            <h3>Detalhes da Coleta</h3>
+            <ul id="pedidosColeta"></ul>
+            <button id="copiarPedidos">Copiar Pedidos</button>
+            <button id="fecharDetalhes">Fechar</button>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
 </body>
 </html>

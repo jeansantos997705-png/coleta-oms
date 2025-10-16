@@ -1,84 +1,38 @@
 let bipagemAtual = [];
+const listaBipada = document.getElementById("listaBipada");
+const mensagem = document.getElementById("mensagem");
+const codigoInput = document.getElementById("codigo");
+const motoristaInput = document.getElementById("motorista");
+const lojaInput = document.getElementById("loja");
 
-const menuBtn = document.getElementById("menu-btn");
 const menu = document.getElementById("menu");
-const bipagemSection = document.getElementById("bipagem-atual-section");
-const historicoSection = document.getElementById("historico-section");
+const abrirMenuBtn = document.getElementById("abrirMenu");
+const fecharMenuBtn = document.getElementById("fecharMenu");
+const abrirHistoricoBtn = document.getElementById("abrirHistorico");
+const exportarBackupBtn = document.getElementById("exportarBackup");
 
-menuBtn.addEventListener("click", () => {
-    menu.style.display = menu.style.display === "flex" ? "none" : "flex";
-});
+const paginaHistorico = document.getElementById("paginaHistorico");
+const voltarMenuBtn = document.getElementById("voltarMenu");
+const listaHistorico = document.getElementById("listaHistorico");
+const detalhesColeta = document.getElementById("detalhesColeta");
+const pedidosColeta = document.getElementById("pedidosColeta");
+const copiarPedidosBtn = document.getElementById("copiarPedidos");
+const fecharDetalhesBtn = document.getElementById("fecharDetalhes");
 
-function abrirBipagemAtual() {
-    bipagemSection.classList.remove("oculto");
-    historicoSection.classList.add("oculto");
-    menu.style.display = "none";
-}
-
-function abrirHistorico() {
-    historicoSection.classList.remove("oculto");
-    bipagemSection.classList.add("oculto");
-    menu.style.display = "none";
-    atualizarHistorico();
-}
-
-document.getElementById("codigo").addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-        adicionarBipagem();
-    }
-});
-
-function adicionarBipagem() {
-    const codigoInput = document.getElementById("codigo");
+// --- Funções bipagem ---
+document.getElementById("adicionar").onclick = () => {
     const codigo = codigoInput.value.trim();
-    const msg = document.getElementById("mensagem");
-
-    if (!codigo) {
-        msg.innerText = "Digite ou bip o código!";
-        return;
-    }
-
-    if (codigo.length !== 12 || !codigo.includes("-")) {
-        msg.innerText = "Código inválido! Deve ter 12 caracteres incluindo o traço.";
-        codigoInput.value = "";
-        return;
-    }
-
-    if (bipagemAtual.includes(codigo)) {
-        msg.innerText = `Código ${codigo} já foi bipado nesta coleta!`;
-        codigoInput.value = "";
-        return;
-    }
-
+    if (!codigo) return;
     bipagemAtual.push(codigo);
-    atualizarListaAtual();
-    msg.innerText = `Código ${codigo} adicionado.`;
+    atualizarListaBipada();
     codigoInput.value = "";
-}
+};
 
-function atualizarListaAtual() {
-    const lista = document.getElementById("lista-atual");
-    lista.innerHTML = "";
-    bipagemAtual.forEach((codigo) => {
-        const li = document.createElement("li");
-        li.textContent = codigo;
-        lista.appendChild(li);
-    });
-    document.getElementById("contagem").innerText = bipagemAtual.length;
-}
-
-async function registrar() {
-    const motorista = document.getElementById("motorista").value.trim();
-    const loja = document.getElementById("loja").value.trim();
-    const msg = document.getElementById("mensagem");
-
-    if (!motorista || !loja) {
-        msg.innerText = "Selecione o motorista e preencha a loja!";
-        return;
-    }
-
-    if (bipagemAtual.length === 0) {
-        msg.innerText = "Nenhum código para registrar!";
+document.getElementById("registrar").onclick = async () => {
+    const motorista = motoristaInput.value;
+    const loja = lojaInput.value;
+    if (!motorista || !loja || bipagemAtual.length === 0) {
+        mensagem.innerText = "Preencha motorista, loja e adicione códigos!";
         return;
     }
 
@@ -87,29 +41,72 @@ async function registrar() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ motorista, loja, codigos: bipagemAtual }),
     });
-
     const data = await resp.json();
-    msg.innerText = data.mensagem;
-
+    mensagem.innerText = data.mensagem;
     bipagemAtual = [];
-    atualizarListaAtual();
-    atualizarHistorico();
-}
+    atualizarListaBipada();
+};
 
-async function atualizarHistorico() {
-    const resp = await fetch("/listar");
-    const dados = await resp.json();
-    const lista = document.getElementById("lista");
-    lista.innerHTML = "";
-    dados.slice(0, 10).forEach((item) => {
+function atualizarListaBipada() {
+    listaBipada.innerHTML = "";
+    bipagemAtual.forEach(c => {
         const li = document.createElement("li");
-        li.textContent = `${item.data} - ${item.motorista} - Loja: ${item.loja} (${item.codigos.length} pedidos)`;
-        lista.appendChild(li);
+        li.textContent = c;
+        listaBipada.appendChild(li);
     });
 }
 
-setInterval(() => {
-    if (!historicoSection.classList.contains("oculto")) {
-        atualizarHistorico();
-    }
-}, 3000);
+// --- Menu ---
+abrirMenuBtn.onclick = () => menu.classList.remove("oculto");
+fecharMenuBtn.onclick = () => menu.classList.add("oculto");
+abrirHistoricoBtn.onclick = () => {
+    menu.classList.add("oculto");
+    paginaHistorico.classList.remove("oculto");
+    carregarHistorico();
+};
+voltarMenuBtn.onclick = () => paginaHistorico.classList.add("oculto");
+
+// --- Histórico ---
+async function carregarHistorico() {
+    const resp = await fetch("/listar");
+    const dados = await resp.json();
+    listaHistorico.innerHTML = "";
+    dados.slice().reverse().forEach((item, index) => {
+        const li = document.createElement("li");
+        li.textContent = `${item.data} - ${item.motorista} - Loja: ${item.loja} (${item.codigos.length} pedidos)`;
+        li.style.cursor = "pointer";
+        li.onclick = () => abrirDetalhes(item);
+        listaHistorico.appendChild(li);
+    });
+}
+
+function abrirDetalhes(coleta) {
+    detalhesColeta.classList.remove("oculto");
+    pedidosColeta.innerHTML = "";
+    coleta.codigos.forEach(c => {
+        const li = document.createElement("li");
+        li.textContent = c;
+        pedidosColeta.appendChild(li);
+    });
+}
+
+function fecharDetalhes() {
+    detalhesColeta.classList.add("oculto");
+}
+
+copiarPedidosBtn.onclick = () => {
+    const textos = Array.from(pedidosColeta.children).map(li => li.textContent).join("\n");
+    navigator.clipboard.writeText(textos);
+    alert("Pedidos copiados!");
+};
+
+exportarBackupBtn.onclick = async () => {
+    const resp = await fetch("/backup");
+    const blob = await resp.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `backup_pedidos.xlsx`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+};

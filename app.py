@@ -1,75 +1,64 @@
-from flask import Flask, render_template, request, jsonify
-import sqlite3
+from flask import Flask, render_template, request, jsonify, send_file
 from datetime import datetime
+import pandas as pd
+import os
 
 app = Flask(__name__)
 
-def get_db_connection():
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row
-    return conn
+# Lista de coletas registradas
+coletas = []
 
-def init_db():
-    conn = get_db_connection()
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS coletas (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            motorista TEXT NOT NULL,
-            loja TEXT NOT NULL,
-            codigo TEXT NOT NULL UNIQUE,
-            data TEXT NOT NULL
-        )
-    ''')
-    conn.commit()
-    conn.close()
-
-init_db()
-
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
-@app.route('/registrar', methods=['POST'])
+@app.route("/registrar", methods=["POST"])
 def registrar():
     data = request.get_json()
-    motorista = data.get('motorista')
-    loja = data.get('loja')
-    codigos = data.get('codigos')
+    motorista = data.get("motorista")
+    loja = data.get("loja")
+    codigos = data.get("codigos", [])
 
     if not motorista or not loja or not codigos:
-        return jsonify({'mensagem': 'Preencha todos os campos!'})
+        return jsonify({"mensagem": "Dados incompletos!"})
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-    msg_geral = []
+    coleta = {
+        "motorista": motorista,
+        "loja": loja,
+        "data": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "codigos": codigos
+    }
+    coletas.append(coleta)
 
-    for codigo in codigos:
-        try:
-            data_atual = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            cur.execute('INSERT INTO coletas (motorista, loja, codigo, data) VALUES (?, ?, ?, ?)',
-                        (motorista, loja, codigo, data_atual))
-            conn.commit()
-            msg_geral.append(f'{codigo} registrado com sucesso.')
-        except sqlite3.IntegrityError:
-            msg_geral.append(f'{codigo} já existe no sistema.')
+    return jsonify({"mensagem": f"Coleta registrada com sucesso! ({len(codigos)} pedidos)"})
 
-    conn.close()
-    return jsonify({'mensagem': ' | '.join(msg_geral)})
-
-@app.route('/listar')
+@app.route("/listar")
 def listar():
-    conn = get_db_connection()
-    coletas = conn.execute('SELECT * FROM coletas ORDER BY data DESC').fetchall()
-    conn.close()
-    result = []
-    for row in coletas:
-        # Agrupa códigos por motorista e loja
-        existing = next((r for r in result if r['motorista']==row['motorista'] and r['loja']==row['loja'] and r['data']==row['data']), None)
-        if existing:
-            existing['codigos'].append(row['codigo'])
-        else:
-            result.append({'motorista': row['motorista'], 'loja': row['loja'], 'data': row['data'], 'codigos':[row['codigo']]})
-    return jsonify(result)
+    # Retorna histórico resumido
+    return jsonify(coletas)
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+@app.route("/backup")
+def backup():
+    if not coletas:
+        return jsonify({"mensagem": "Sem coletas para exportar"}), 400
+
+    df_rows = []
+    for coleta in coletas:
+        for c in coleta["codigos"]:
+            df_rows.append({
+                "Motorista": coleta["motorista"],
+                "Loja": coleta["loja"],
+                "Data/Hora": coleta["data"],
+                "Código Pedido": c
+            })
+
+    df = pd.DataFrame(df_rows)
+
+    backup_file = "backup_pedidos.xlsx"
+    df.to_excel(backup_file, index=False)
+
+    return send_file(backup_file, as_attachment=True)
+
+if __name__ == "__main__":
+    # Para rodar no Render ou em qualquer servidor: host 0.0.0.0
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
