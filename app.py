@@ -1,113 +1,143 @@
 from flask import Flask, render_template, request, jsonify, send_file
-import sqlite3
+from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from dotenv import load_dotenv
+import os
 import pandas as pd
-import io
+from io import BytesIO
+
+# --- Carrega variáveis do .env ---
+load_dotenv()
 
 app = Flask(__name__)
 
-# ------------------- Banco de dados -------------------
-def get_db_connection():
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row
-    return conn
+# --- Configura banco de dados ---
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-def init_db():
-    conn = get_db_connection()
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS coletas (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            codigo TEXT NOT NULL UNIQUE,
-            motorista TEXT NOT NULL,
-            loja TEXT NOT NULL,
-            data TEXT NOT NULL
-        )
-    ''')
-    conn.commit()
-    conn.close()
+db = SQLAlchemy(app)
 
-init_db()
+# --- Tabela de coletas ---
+class Coleta(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    codigo = db.Column(db.String(12), unique=True, nullable=False)
+    motorista = db.Column(db.String(50), nullable=False)
+    loja = db.Column(db.String(20), nullable=False)
+    data = db.Column(db.DateTime, default=datetime.utcnow)
 
-# ------------------- Página inicial -------------------
+# --- Inicializa banco (cria tabelas) ---
+with app.app_context():
+    db.create_all()
+
+# --- Página inicial ---
 @app.route('/')
 def index():
-    return render_template('index.html')
+    motoristas = [
+        "Silenildo", "Adryen", "Priscila", "Uelber", 
+        "Luiz Carlos", "Luis Gerson", "Marcio", "Dayveson", "Dalvan"
+    ]
+    return render_template('index.html', motoristas=motoristas)
 
-# ------------------- Registrar múltiplos pedidos -------------------
+# --- Registrar pedidos (somente após confirmação) ---
 @app.route('/registrar', methods=['POST'])
 def registrar():
     data = request.get_json()
     motorista = data.get('motorista')
     loja = data.get('loja')
-    codigos = data.get('codigos')
+    codigos = data.get('codigos')  # Lista de códigos bipados
 
-    if not motorista or not loja or not codigos or len(codigos) == 0:
-        return jsonify({'status':'erro', 'mensagem':'Preencha todos os campos e adicione pelo menos um código!'})
+    if not motorista or not loja or not codigos:
+        return jsonify({'status': 'erro', 'mensagem': 'Preencha todos os campos e bipes pelo menos um código!'})
 
-    data_atual = datetime.now().strftime('%Y-%m-%d %H:%M')
-    conn = get_db_connection()
-    cur = conn.cursor()
     mensagens = []
-
     for codigo in codigos:
+        # Validação: 12 caracteres com traço
         if len(codigo) != 12 or '-' not in codigo:
-            mensagens.append(f"Código inválido: {codigo}")
+            mensagens.append(f"Código {codigo} inválido!")
             continue
-        cur.execute('SELECT * FROM coletas WHERE codigo = ?', (codigo,))
-        existente = cur.fetchone()
+
+        # Verifica duplicidade
+        existente = Coleta.query.filter_by(codigo=codigo).first()
         if existente:
-            mensagens.append(f"Código duplicado: {codigo}")
+            mensagens.append(f"Código {codigo} já registrado!")
             continue
-        cur.execute('INSERT INTO coletas (codigo, motorista, loja, data) VALUES (?, ?, ?, ?)',
-                    (codigo, motorista, loja, data_atual))
-    conn.commit()
-    conn.close()
 
-    if mensagens:
-        return jsonify({'status':'parcial','mensagem':'\n'.join(mensagens)})
-    return jsonify({'status':'ok','mensagem':'Coleta registrada com sucesso!'})
+        # Grava no banco
+        nova = Coleta(codigo=codigo, motorista=motorista, loja=loja)
+        db.session.add(nova)
+        mensagens.append(f"Código {codigo} registrado com sucesso!")
 
-# ------------------- Histórico agrupado -------------------
-@app.route('/historico')
-def historico():
-    conn = get_db_connection()
-    coletas = conn.execute('''
-        SELECT motorista, loja, data, COUNT(codigo) AS total
-        FROM coletas
-        GROUP BY motorista, loja, data
-        ORDER BY data DESC
-    ''').fetchall()
-    conn.close()
-    return jsonify([dict(row) for row in coletas])
+    db.session.commit()
+    return jsonify({'status': 'ok', 'mensagens': mensagens})
 
-# ------------------- Detalhes de uma coleta -------------------
-@app.route('/detalhes')
-def detalhes():
-    motorista = request.args.get('motorista')
-    loja = request.args.get('loja')
-    data = request.args.get('data')
+# --- Listar últimos registros ---
+@app.route('/listar')
+def listar():
+    coletas = Coleta.query.order_by(Coleta.data.desc()).limit(100).all()
+    return jsonify([{
+        'id': c.id,
+        'codigo': c.codigo,
+        'motorista': c.motorista,
+        'loja': c.loja,
+        'data': c.data.strftime('%Y-%m-%d %H:%M')
+    } for c in coletas])
 
-    conn = get_db_connection()
-    coletas = conn.execute('''
-        SELECT codigo FROM coletas
-        WHERE motorista=? AND loja=? AND data=?
-    ''', (motorista, loja, data)).fetchall()
-    conn.close()
-    return jsonify([row['codigo'] for row in coletas])
-
-# ------------------- Backup em Excel -------------------
+# --- Backup Excel ---
 @app.route('/backup')
 def backup():
-    conn = get_db_connection()
-    df = pd.read_sql_query('SELECT * FROM coletas', conn)
-    conn.close()
+    coletas = Coleta.query.order_by(Coleta.data.desc()).all()
+    df = pd.DataFrame([{
+        'ID': c.id,
+        'Código': c.codigo,
+        'Motorista': c.motorista,
+        'Loja': c.loja,
+        'Data': c.data.strftime('%Y-%m-%d %H:%M')
+    } for c in coletas])
 
-    output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, sheet_name='Coletas')
+    output = BytesIO()
+    df.to_excel(output, index=False)
     output.seek(0)
-    return send_file(output, as_attachment=True, download_name='backup_coletas.xlsx')
 
-# ------------------- Rodar o Flask -------------------
+    return send_file(output, download_name="backup_coletas.xlsx", as_attachment=True)
+
+# --- Histórico detalhado ---
+@app.route('/historico')
+def historico():
+    return render_template('historico.html')
+
+# --- API para histórico filtrado ---
+@app.route('/historico/listar', methods=['GET'])
+def historico_listar():
+    motorista = request.args.get('motorista')
+    loja = request.args.get('loja')
+    data_str = request.args.get('data')
+
+    query = Coleta.query
+
+    if motorista:
+        query = query.filter_by(motorista=motorista)
+    if loja:
+        query = query.filter_by(loja=loja)
+    if data_str:
+        try:
+            data = datetime.strptime(data_str, "%Y-%m-%d")
+            query = query.filter(
+                db.func.date(Coleta.data) == data.date()
+            )
+        except:
+            pass
+
+    coletas = query.order_by(Coleta.data.desc()).all()
+    resultado = {}
+    for c in coletas:
+        key = f"{c.motorista} | {c.loja} | {c.data.strftime('%Y-%m-%d %H:%M')}"
+        if key not in resultado:
+            resultado[key] = []
+        resultado[key].append(c.codigo)
+
+    return jsonify(resultado)
+
+# --- Rodar aplicação ---
 if __name__ == '__main__':
+    # Para testes locais
     app.run(host='0.0.0.0', port=5000, debug=True)

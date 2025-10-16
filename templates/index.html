@@ -2,25 +2,16 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Controle de Coletas</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de Coletas</title>
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <header>
-    <h1>📦OMS</h1>
-    <button id="menuBtn">☰</button>
-  </header>
+  <h1>📦 Controle de Coletas</h1>
 
-  <nav id="menu" class="hidden">
-    <button onclick="mostrarHistorico()">📜 Histórico</button>
-    <button onclick="gerarBackup()">💾 Backup</button>
-  </nav>
-
-  <main id="tela-principal">
-    <label>Motorista:</label>
+  <div id="form">
     <select id="motorista">
-      <option value="">Selecione...</option>
+      <option value="">Selecione o motorista</option>
       <option>Silenildo</option>
       <option>Adryen</option>
       <option>Priscila</option>
@@ -31,32 +22,29 @@
       <option>Dayveson</option>
       <option>Dalvan</option>
     </select>
+    <input type="text" id="loja" placeholder="Número da loja">
+    <input type="text" id="codigo" placeholder="Bipe o código" autofocus>
+    <button onclick="adicionarBipagem()">Adicionar bipagem</button>
+    <button onclick="registrar()">Registrar</button>
+  </div>
 
-    <label>Loja:</label>
-    <input type="text" id="loja" placeholder="Loja" />
+  <p id="mensagem"></p>
 
-    <label>Bipagem:</label>
-    <input type="text" id="codigo" placeholder="Pedido" autofocus onkeypress="if(event.key==='Enter'){adicionarBipagem();}" />
-    <button onclick="registrarColeta()">Registrar Coleta</button>
+  <div style="display:flex; flex-direction:row; gap:20px; flex-wrap:wrap;">
+    <div style="flex:1;">
+      <h2>Coletas da sessão</h2>
+      <ul id="bipagemAtual"></ul>
+    </div>
 
-    <p id="mensagem"></p>
-
-    <h2>Pedidos bipados:</h2>
-    <ul id="listaBipagem"></ul>
-  </main>
-
-  <section id="historico" class="hidden">
-    <h2>📜 Histórico de Coletas</h2>
-    <ul id="listaHistorico"></ul>
-    <button onclick="voltar()">⬅️ Voltar</button>
-  </section>
-
-  <section id="detalhes" class="hidden">
-    <h2>📦 Detalhes da Coleta</h2>
-    <ul id="listaDetalhes"></ul>
-    <button onclick="copiarPedidos()">📋 Copiar pedidos</button>
-    <button onclick="voltarHistorico()">⬅️ Voltar</button>
-  </section>
+    <div style="flex:1;">
+      <h2>Menu</h2>
+      <button onclick="toggleMenu()">Abrir/Fechar Menu</button>
+      <div id="menu" style="display:none; margin-top:10px;">
+        <button onclick="baixarBackup()">Backup Excel</button>
+        <a href="/historico" target="_blank"><button>Histórico</button></a>
+      </div>
+    </div>
+  </div>
 
   <script src="/static/script.js"></script>
 </body>
