@@ -1,64 +1,89 @@
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify
+import psycopg2
 from datetime import datetime
-import pandas as pd
-import os
 
 app = Flask(__name__)
 
-# Lista de coletas registradas
-coletas = []
+# --- Conexão com o banco Neon ---
+def get_db_connection():
+    conn = psycopg2.connect(
+        "postgresql://neondb_owner:npg_2KY9maNofGWO@ep-nameless-art-adgk8l8m-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+    )
+    return conn
 
-@app.route("/")
+# --- Página inicial ---
+@app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template('index.html')
 
-@app.route("/registrar", methods=["POST"])
+# --- Registrar bipagem ---
+@app.route('/registrar', methods=['POST'])
 def registrar():
     data = request.get_json()
-    motorista = data.get("motorista")
-    loja = data.get("loja")
-    codigos = data.get("codigos", [])
+    codigo = data.get('codigo')
+    motorista = data.get('motorista')
+    loja = data.get('loja')
 
-    if not motorista or not loja or not codigos:
-        return jsonify({"mensagem": "Dados incompletos!"})
+    if not codigo or not motorista or not loja:
+        return jsonify({'status': 'erro', 'mensagem': 'Preencha motorista, loja e código!'})
 
-    coleta = {
-        "motorista": motorista,
-        "loja": loja,
-        "data": datetime.now().strftime("%d/%m/%Y %H:%M"),
-        "codigos": codigos
-    }
-    coletas.append(coleta)
+    conn = get_db_connection()
+    cur = conn.cursor()
 
-    return jsonify({"mensagem": f"Coleta registrada com sucesso! ({len(codigos)} pedidos)"})
+    # Verifica duplicidade
+    cur.execute('SELECT * FROM coletas WHERE codigo = %s', (codigo,))
+    existente = cur.fetchone()
+    if existente:
+        conn.close()
+        return jsonify({'status': 'duplicado', 'mensagem': f'Código {codigo} já registrado!'})
 
-@app.route("/listar")
-def listar():
-    # Retorna histórico resumido
-    return jsonify(coletas)
+    # Grava novo código
+    data_atual = datetime.now()
+    cur.execute('INSERT INTO coletas (codigo, motorista, loja, data) VALUES (%s, %s, %s, %s)',
+                (codigo, motorista, loja, data_atual))
+    conn.commit()
+    conn.close()
+    return jsonify({'status': 'ok', 'mensagem': f'Código {codigo} registrado com sucesso!'})
 
-@app.route("/backup")
-def backup():
-    if not coletas:
-        return jsonify({"mensagem": "Sem coletas para exportar"}), 400
+# --- Histórico com filtros ---
+@app.route('/historico', methods=['GET'])
+def historico():
+    motorista = request.args.get("motorista")
+    loja = request.args.get("loja")
+    data = request.args.get("data")
 
-    df_rows = []
-    for coleta in coletas:
-        for c in coleta["codigos"]:
-            df_rows.append({
-                "Motorista": coleta["motorista"],
-                "Loja": coleta["loja"],
-                "Data/Hora": coleta["data"],
-                "Código Pedido": c
-            })
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    query = "SELECT id, codigo, motorista, loja, data FROM coletas WHERE 1=1"
+    params = []
 
-    df = pd.DataFrame(df_rows)
+    if motorista:
+        query += " AND motorista = %s"
+        params.append(motorista)
+    if loja:
+        query += " AND loja = %s"
+        params.append(loja)
+    if data:
+        query += " AND data::date = %s"
+        params.append(data)
 
-    backup_file = "backup_pedidos.xlsx"
-    df.to_excel(backup_file, index=False)
+    query += " ORDER BY data DESC"
+    cur.execute(query, params)
+    registros = cur.fetchall()
+    conn.close()
 
-    return send_file(backup_file, as_attachment=True)
+    resultado = [
+        {
+            "id": r[0],
+            "codigo": r[1],
+            "motorista": r[2],
+            "loja": r[3],
+            "data": r[4].strftime("%Y-%m-%d %H:%M")
+        }
+        for r in registros
+    ]
+    return jsonify(resultado)
 
-if __name__ == "__main__":
-    # Para rodar no Render ou em qualquer servidor: host 0.0.0.0
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)

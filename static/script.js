@@ -1,105 +1,88 @@
-let bipagemAtual = [];
+let bipagens = [];
 
-async function adicionarCodigo() {
-    const codigo = document.getElementById("codigo").value.trim();
-    const loja = document.getElementById("loja").value.trim();
-    const motorista = document.getElementById("motorista").value.trim();
+function adicionarBipagem() {
+    const codigoInput = document.getElementById("codigo");
+    const motoristaInput = document.getElementById("motorista");
+    const lojaInput = document.getElementById("loja");
     const msg = document.getElementById("mensagem");
 
-    if (!codigo || !loja || !motorista) {
+    const codigo = codigoInput.value.trim();
+    const motorista = motoristaInput.value.trim();
+    const loja = lojaInput.value.trim();
+
+    if (!codigo || !motorista || !loja) {
         msg.innerText = "Preencha motorista, loja e código!";
         return;
     }
 
-    if (codigo.length !== 12 || codigo[9] !== '-') { 
-        msg.innerText = "Código inválido! Deve ter 12 caracteres com traço.";
-        return;
-    }
-
-    if (bipagemAtual.includes(codigo)) {
-        msg.innerText = `Código ${codigo} já adicionado nesta bipagem!`;
-        return;
-    }
-
-    bipagemAtual.push(codigo);
+    bipagens.push({codigo, motorista, loja});
     atualizarBipagemAtual();
-    document.getElementById("codigo").value = "";
-    document.getElementById("contador").innerText = bipagemAtual.length;
-    msg.innerText = "";
+    codigoInput.value = "";
+    codigoInput.focus();
 }
 
 function atualizarBipagemAtual() {
-    const lista = document.getElementById("bipagemAtual");
+    const lista = document.getElementById("bipagem-atual");
     lista.innerHTML = "";
-    bipagemAtual.forEach(item => {
+    bipagens.forEach(item => {
         const li = document.createElement("li");
-        li.textContent = item;
+        li.textContent = `${item.codigo} - ${item.motorista} - Loja ${item.loja}`;
         lista.appendChild(li);
     });
+    document.getElementById("contador").innerText = bipagens.length;
 }
 
-async function registrarTudo() {
-    const loja = document.getElementById("loja").value.trim();
-    const motorista = document.getElementById("motorista").value.trim();
+async function registrarBipagens() {
     const msg = document.getElementById("mensagem");
-
-    if (!loja || !motorista || bipagemAtual.length === 0) {
-        msg.innerText = "Preencha tudo e adicione pelo menos um código!";
-        return;
-    }
-
-    for (const codigo of bipagemAtual) {
-        await fetch("/registrar", {
+    for (let item of bipagens) {
+        const resp = await fetch("/registrar", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ codigo, motorista, loja })
+            body: JSON.stringify(item)
         });
+        const data = await resp.json();
+        msg.innerText = data.mensagem;
     }
-
-    bipagemAtual = [];
+    bipagens = [];
     atualizarBipagemAtual();
-    document.getElementById("contador").innerText = 0;
-    msg.innerText = "Todos os códigos registrados com sucesso!";
-    atualizarHistorico();
 }
 
-// Controle do menu
+// --- Menu ---
 function abrirMenu() {
-    document.getElementById("mainScreen").style.display = "none";
-    document.getElementById("menuScreen").style.display = "block";
+    document.getElementById("menu").classList.remove("menu-oculto");
 }
-
 function fecharMenu() {
-    document.getElementById("menuScreen").style.display = "none";
-    document.getElementById("mainScreen").style.display = "block";
+    document.getElementById("menu").classList.add("menu-oculto");
 }
 
+// --- Histórico ---
 function abrirHistorico() {
-    document.getElementById("menuScreen").style.display = "none";
-    document.getElementById("historicoScreen").style.display = "block";
-    atualizarHistorico();
+    fecharMenu();
+    document.getElementById("historico-tela").classList.remove("menu-oculto");
 }
 
 function fecharHistorico() {
-    document.getElementById("historicoScreen").style.display = "none";
-    document.getElementById("mainScreen").style.display = "block";
+    document.getElementById("historico-tela").classList.add("menu-oculto");
 }
 
-async function atualizarHistorico() {
-    const resp = await fetch("/listar");
-    const dados = await resp.json();
-    const lista = document.getElementById("historicoLista");
+async function filtrarHistorico() {
+    const motorista = document.getElementById("filtro-motorista").value;
+    const loja = document.getElementById("filtro-loja").value;
+    const data = document.getElementById("filtro-data").value;
+
+    let url = `/historico?`;
+    if (motorista) url += `motorista=${motorista}&`;
+    if (loja) url += `loja=${loja}&`;
+    if (data) url += `data=${data}&`;
+
+    const resp = await fetch(url);
+    const registros = await resp.json();
+    const lista = document.getElementById("lista-historico");
     lista.innerHTML = "";
-    dados.forEach(item => {
+
+    registros.forEach(r => {
         const li = document.createElement("li");
-        li.textContent = `${item.data} - ${item.motorista} - Loja ${item.loja} - ${item.codigo}`;
+        li.textContent = `${r.data} - ${r.motorista} - Loja ${r.loja} - ${r.codigo}`;
         lista.appendChild(li);
     });
 }
-
-// Enter adiciona código
-document.getElementById("codigo").addEventListener("keyup", function(event) {
-    if (event.key === "Enter") {
-        adicionarCodigo();
-    }
-});

@@ -2,57 +2,64 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Controle de Coletas</title>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
   <h1>📦 Controle de Coletas</h1>
 
-  <!-- Tela principal de bipagem -->
-  <div id="mainScreen">
-    <div id="form">
-      <select id="motorista">
-        <option value="">Selecione o motorista</option>
-        <option>Silenildo</option>
-        <option>Adryen</option>
-        <option>Priscila</option>
-        <option>Uelber</option>
-        <option>Luiz Carlos</option>
-        <option>Luis Gerson</option>
-        <option>Marcio</option>
-        <option>Dayveson</option>
-        <option>Dalvan</option>
+  <div id="form">
+    <select id="motorista">
+      <option value="">Selecione motorista</option>
+      <option value="Silenildo">Silenildo</option>
+      <option value="Adryen">Adryen</option>
+      <option value="Priscila">Priscila</option>
+      <option value="Uelber">Uelber</option>
+      <option value="Luiz Carlos">Luiz Carlos</option>
+      <option value="Luis Gerson">Luis Gerson</option>
+      <option value="Marcio">Marcio</option>
+      <option value="Dayveson">Dayveson</option>
+      <option value="Dalvan">Dalvan</option>
+    </select>
+    <input type="text" id="loja" placeholder="Número da loja" />
+    <input type="text" id="codigo" placeholder="Bipe o código" autofocus />
+    <button onclick="adicionarBipagem()">Adicionar</button>
+  </div>
+
+  <p id="mensagem"></p>
+
+  <h2>Bipagem Atual (<span id="contador">0</span>)</h2>
+  <ul id="bipagem-atual"></ul>
+
+  <button id="btn-menu" onclick="abrirMenu()">Menu</button>
+
+  <div id="menu" class="menu-oculto">
+    <h2>Menu</h2>
+    <button onclick="abrirHistorico()">Histórico</button>
+    <button onclick="fecharMenu()">Fechar</button>
+  </div>
+
+  <div id="historico-tela" class="menu-oculto">
+    <h2>Histórico de Coletas</h2>
+    <div id="historico-filtros">
+      <select id="filtro-motorista">
+        <option value="">Todos Motoristas</option>
+        <option value="Silenildo">Silenildo</option>
+        <option value="Adryen">Adryen</option>
+        <option value="Priscila">Priscila</option>
+        <option value="Uelber">Uelber</option>
+        <option value="Luiz Carlos">Luiz Carlos</option>
+        <option value="Luis Gerson">Luis Gerson</option>
+        <option value="Marcio">Marcio</option>
+        <option value="Dayveson">Dayveson</option>
+        <option value="Dalvan">Dalvan</option>
       </select>
-      <input type="text" id="loja" placeholder="Número da loja" />
-      <input type="text" id="codigo" placeholder="Bipe o código" autofocus />
-      <button onclick="adicionarCodigo()">Adicionar</button>
-      <button onclick="registrarTudo()">Registrar</button>
-      <button onclick="abrirMenu()">Menu</button>
+      <input type="text" id="filtro-loja" placeholder="Número da loja">
+      <input type="date" id="filtro-data">
+      <button onclick="filtrarHistorico()">Filtrar</button>
     </div>
-
-    <p id="mensagem"></p>
-
-    <h2>Bipagem Atual (<span id="contador">0</span>)</h2>
-    <ul id="bipagemAtual"></ul>
-  </div>
-
-  <!-- Tela de menu -->
-  <div id="menuScreen" class="overlay" style="display:none;">
-    <div class="overlayContent">
-      <button onclick="fecharMenu()" class="fechar">Fechar ✖</button>
-      <h2>Menu</h2>
-      <button onclick="abrirHistorico()">Histórico</button>
-    </div>
-  </div>
-
-  <!-- Tela de histórico -->
-  <div id="historicoScreen" class="overlay" style="display:none;">
-    <div class="overlayContent">
-      <button onclick="fecharHistorico()" class="fechar">Voltar ✖</button>
-      <h2>Histórico de Pedidos</h2>
-      <ul id="historicoLista"></ul>
-    </div>
+    <ul id="lista-historico"></ul>
+    <button onclick="fecharHistorico()">Fechar Histórico</button>
   </div>
 
   <script src="/static/script.js"></script>
