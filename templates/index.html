@@ -2,61 +2,51 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Controle de Coletas</title>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-  <!-- Página principal: bipagem atual -->
-  <div id="pagina-bipagem" class="pagina ativa">
-    <h1>📦 Bipagem Atual</h1>
+  <h1>📦 Controle de Coletas</h1>
 
-    <div id="form">
-      <select id="motorista">
-        <option value="">Selecione o motorista</option>
-        <option value="Silenildo">Silenildo</option>
-        <option value="Adryen">Adryen</option>
-        <option value="Priscila">Priscila</option>
-        <option value="Uelber">Uelber</option>
-        <option value="Luiz Carlos">Luiz Carlos</option>
-        <option value="Luis Gerson">Luis Gerson</option>
-        <option value="Marcio">Marcio</option>
-        <option value="Dayveson">Dayveson</option>
-        <option value="Dalvan">Dalvan</option>
-      </select>
-
-      <input type="text" id="loja" placeholder="Número da Loja" />
-      <input type="text" id="codigo" placeholder="Bipe o código" autofocus />
-      <button onclick="adicionarCodigo()">Adicionar</button>
-    </div>
-
-    <p id="mensagem"></p>
-    <h2>Bipagem Atual: <span id="contador">0</span> pedidos</h2>
-    <ul id="bipagemAtual"></ul>
-
-    <button onclick="registrarBipagem()">Registrar Bipagem</button>
+  <div id="form">
+    <select id="motorista">
+      <option value="">Selecione o motorista</option>
+      <option>Silenildo</option>
+      <option>Adryen</option>
+      <option>Priscila</option>
+      <option>Uelber</option>
+      <option>Luiz Carlos</option>
+      <option>Luis Gerson</option>
+      <option>Marcio</option>
+      <option>Dayveson</option>
+      <option>Dalvan</option>
+    </select>
+    <input type="text" id="loja" placeholder="Número da loja" />
+    <input type="text" id="codigo" placeholder="Bipe o código" autofocus />
+    <button onclick="adicionarCodigo()">Adicionar</button>
+    <button onclick="registrarTudo()">Registrar</button>
     <button onclick="abrirMenu()">Menu</button>
   </div>
 
-  <!-- Página menu -->
-  <div id="pagina-menu" class="pagina">
-    <h1>Menu</h1>
-    <button onclick="abrirHistorico()">Histórico</button>
-    <button onclick="exportarBackup()">Exportar Backup</button>
-    <button onclick="voltarBipagem()">Voltar</button>
+  <p id="mensagem"></p>
+
+  <h2>Bipagem Atual (<span id="contador">0</span>)</h2>
+  <ul id="bipagemAtual"></ul>
+
+  <!-- Menu flutuante -->
+  <div id="menu" class="menu">
+    <button onclick="fecharMenu()" class="fechar">Fechar ✖</button>
+    <h2>Menu</h2>
+    <button onclick="document.getElementById('historicoSec').style.display='block'; fecharMenu()">Histórico</button>
+    <button onclick="window.location.href='/backup'">Exportar Backup</button>
   </div>
 
-  <!-- Página histórico -->
-  <div id="pagina-historico" class="pagina">
-    <h1>Histórico de Coletas</h1>
-    <div id="filtros">
-      <input type="text" id="filtrar-motorista" placeholder="Filtrar por motorista" />
-      <input type="text" id="filtrar-loja" placeholder="Filtrar por loja" />
-      <input type="date" id="filtrar-data" />
-      <button onclick="aplicarFiltros()">Filtrar</button>
-    </div>
-    <ul id="historico-lista"></ul>
-    <button onclick="voltarMenu()">Voltar</button>
+  <!-- Histórico -->
+  <div id="historicoSec" style="display:none;">
+    <h2>Histórico de Pedidos</h2>
+    <button onclick="document.getElementById('historicoSec').style.display='none'">Voltar</button>
+    <ul id="historicoLista"></ul>
   </div>
 
   <script src="/static/script.js"></script>

@@ -1,5 +1,15 @@
 let bipagemAtual = [];
 
+// ===================== Menu =====================
+function abrirMenu() {
+  document.getElementById("menu").style.display = "block";
+}
+
+function fecharMenu() {
+  document.getElementById("menu").style.display = "none";
+}
+
+// ===================== Bipagem =====================
 async function adicionarCodigo() {
   const motorista = document.getElementById("motorista").value;
   const loja = document.getElementById("loja").value;
@@ -12,7 +22,6 @@ async function adicionarCodigo() {
     return;
   }
 
-  // Bloqueio do tamanho do código
   if (codigo.length !== 12) {
     msg.innerText = "Código deve ter 12 caracteres (incluindo o traço).";
     return;
@@ -25,11 +34,10 @@ async function adicionarCodigo() {
   msg.innerText = "";
 }
 
-// Atualiza a lista de bipagem atual
 function atualizarBipagemAtual() {
   const lista = document.getElementById("bipagemAtual");
   lista.innerHTML = "";
-  bipagemAtual.forEach((item, index) => {
+  bipagemAtual.forEach((item) => {
     const li = document.createElement("li");
     li.textContent = `${item.codigo} (${item.loja})`;
     lista.appendChild(li);
@@ -37,7 +45,6 @@ function atualizarBipagemAtual() {
   document.getElementById("contador").innerText = bipagemAtual.length;
 }
 
-// Registrar todos os códigos no banco
 async function registrarTudo() {
   const msg = document.getElementById("mensagem");
   if (bipagemAtual.length === 0) {
@@ -59,7 +66,7 @@ async function registrarTudo() {
   carregarHistorico();
 }
 
-// Carrega o histórico do servidor
+// ===================== Histórico =====================
 async function carregarHistorico() {
   const resp = await fetch("/historico");
   const data = await resp.json();
@@ -75,7 +82,6 @@ async function carregarHistorico() {
   }
 }
 
-// Copiar pedidos de uma coleta específica
 function copiarPedidos(chave) {
   fetch(`/historico`).then(resp => resp.json()).then(data => {
     const pedidos = data[chave];
@@ -85,12 +91,11 @@ function copiarPedidos(chave) {
   });
 }
 
-// Adiciona código ao pressionar Enter
+// ===================== Eventos =====================
 document.getElementById("codigo").addEventListener("keydown", function (e) {
   if (e.key === "Enter") {
     adicionarCodigo();
   }
 });
 
-// Atualiza o histórico ao carregar a página
 window.addEventListener("load", carregarHistorico);
