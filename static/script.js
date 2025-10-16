@@ -1,99 +1,96 @@
 let bipagemAtual = [];
 
-// --- Bipagem ---
-function atualizarListaBipagem() {
-    const lista = document.getElementById("bipagemAtual");
-    lista.innerHTML = "";
-    bipagemAtual.forEach(codigo => {
-        const li = document.createElement("li");
-        li.textContent = codigo;
-        lista.appendChild(li);
+async function adicionarCodigo() {
+  const motorista = document.getElementById("motorista").value;
+  const loja = document.getElementById("loja").value;
+  const codigoInput = document.getElementById("codigo");
+  const codigo = codigoInput.value.trim();
+  const msg = document.getElementById("mensagem");
+
+  if (!motorista || !loja || !codigo) {
+    msg.innerText = "Preencha todos os campos!";
+    return;
+  }
+
+  // Bloqueio do tamanho do código
+  if (codigo.length !== 12) {
+    msg.innerText = "Código deve ter 12 caracteres (incluindo o traço).";
+    return;
+  }
+
+  bipagemAtual.push({ motorista, loja, codigo });
+  atualizarBipagemAtual();
+  codigoInput.value = "";
+  codigoInput.focus();
+  msg.innerText = "";
+}
+
+// Atualiza a lista de bipagem atual
+function atualizarBipagemAtual() {
+  const lista = document.getElementById("bipagemAtual");
+  lista.innerHTML = "";
+  bipagemAtual.forEach((item, index) => {
+    const li = document.createElement("li");
+    li.textContent = `${item.codigo} (${item.loja})`;
+    lista.appendChild(li);
+  });
+  document.getElementById("contador").innerText = bipagemAtual.length;
+}
+
+// Registrar todos os códigos no banco
+async function registrarTudo() {
+  const msg = document.getElementById("mensagem");
+  if (bipagemAtual.length === 0) {
+    msg.innerText = "Nenhum código para registrar!";
+    return;
+  }
+
+  for (let item of bipagemAtual) {
+    await fetch("/registrar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(item),
     });
-    document.getElementById("contador").innerText = bipagemAtual.length;
+  }
+
+  bipagemAtual = [];
+  atualizarBipagemAtual();
+  msg.innerText = "Bipagem registrada com sucesso!";
+  carregarHistorico();
 }
 
-function adicionarCodigo() {
-    const codigoInput = document.getElementById("codigo");
-    const codigo = codigoInput.value.trim();
-    const msg = document.getElementById("mensagem");
+// Carrega o histórico do servidor
+async function carregarHistorico() {
+  const resp = await fetch("/historico");
+  const data = await resp.json();
+  const lista = document.getElementById("historicoLista");
+  lista.innerHTML = "";
 
-    if (!codigo) { msg.innerText = "Digite ou bip um código!"; return; }
-    if (codigo.length !== 12 || codigo[9] !== '-') {
-        msg.innerText = "Código inválido! Deve ter 12 caracteres e incluir o traço.";
-        codigoInput.value = "";
-        return;
-    }
-    if (bipagemAtual.includes(codigo)) {
-        msg.innerText = `Código ${codigo} já adicionado na bipagem atual!`;
-        codigoInput.value = "";
-        return;
-    }
-
-    bipagemAtual.push(codigo);
-    msg.innerText = `Código ${codigo} adicionado.`;
-    codigoInput.value = "";
-    atualizarListaBipagem();
+  for (let chave in data) {
+    const pedidos = data[chave];
+    const li = document.createElement("li");
+    li.innerHTML = `<strong>${chave}</strong> - ${pedidos.length} pedidos
+                    <button onclick="copiarPedidos('${chave}')">Copiar pedidos</button>`;
+    lista.appendChild(li);
+  }
 }
 
-// Enter para adicionar
-document.getElementById("codigo").addEventListener("keypress", e => {
-    if (e.key === "Enter") adicionarCodigo();
+// Copiar pedidos de uma coleta específica
+function copiarPedidos(chave) {
+  fetch(`/historico`).then(resp => resp.json()).then(data => {
+    const pedidos = data[chave];
+    navigator.clipboard.writeText(pedidos.join("\n")).then(() => {
+      alert("Pedidos copiados!");
+    });
+  });
+}
+
+// Adiciona código ao pressionar Enter
+document.getElementById("codigo").addEventListener("keydown", function (e) {
+  if (e.key === "Enter") {
+    adicionarCodigo();
+  }
 });
 
-async function registrarBipagem() {
-    const motorista = document.getElementById("motorista").value.trim();
-    const loja = document.getElementById("loja").value.trim();
-    const msg = document.getElementById("mensagem");
-
-    if (!motorista || !loja) { msg.innerText = "Selecione o motorista e informe a loja!"; return; }
-    if (bipagemAtual.length === 0) { msg.innerText = "Nenhum código na bipagem atual!"; return; }
-
-    for (let codigo of bipagemAtual) {
-        await fetch("/registrar", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ motorista, loja, codigo }),
-        });
-    }
-
-    bipagemAtual = [];
-    atualizarListaBipagem();
-    msg.innerText = "Bipagem registrada com sucesso!";
-}
-
-// --- Navegação de páginas ---
-function abrirMenu() {
-    document.querySelectorAll(".pagina").forEach(p => p.classList.remove("ativa"));
-    document.getElementById("pagina-menu").classList.add("ativa");
-}
-
-function voltarBipagem() {
-    document.querySelectorAll(".pagina").forEach(p => p.classList.remove("ativa"));
-    document.getElementById("pagina-bipagem").classList.add("ativa");
-}
-
-function abrirHistorico() {
-    document.querySelectorAll(".pagina").forEach(p => p.classList.remove("ativa"));
-    document.getElementById("pagina-historico").classList.add("ativa");
-    carregarHistorico();
-}
-
-function voltarMenu() {
-    document.querySelectorAll(".pagina").forEach(p => p.classList.remove("ativa"));
-    document.getElementById("pagina-menu").classList.add("ativa");
-}
-
-// --- Histórico (placeholder) ---
-function carregarHistorico() {
-    const lista = document.getElementById("historico-lista");
-    lista.innerHTML = "<li>Carregando histórico...</li>";
-}
-
-function aplicarFiltros() {
-    alert("Aqui aplicamos filtros de motorista, loja e data.");
-}
-
-// --- Backup (placeholder) ---
-function exportarBackup() {
-    alert("Aqui você exporta o backup em Excel.");
-}
+// Atualiza o histórico ao carregar a página
+window.addEventListener("load", carregarHistorico);
