@@ -6,38 +6,47 @@
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-  <h1>📦 Controle de Coletas</h1>
+  <header>
+    <h1>📦 Controle de Coletas</h1>
+    <button id="menu-btn">☰ Menu</button>
+    <nav id="menu">
+      <ul>
+        <li><a href="#" onclick="abrirBipagemAtual()">Bipagem Atual</a></li>
+        <li><a href="#" onclick="abrirHistorico()">Histórico</a></li>
+      </ul>
+    </nav>
+  </header>
 
-  <div id="form">
-    <select id="motorista">
-      <option value="">Selecione o motorista</option>
-      <option value="Silenildo">Silenildo</option>
-      <option value="Adryen">Adryen</option>
-      <option value="Priscila">Priscila</option>
-      <option value="Uelber">Uelber</option>
-      <option value="Luiz Carlos">Luiz Carlos</option>
-      <option value="Luis Gerson">Luis Gerson</option>
-      <option value="Marcio">Marcio</option>
-      <option value="Dayveson">Dayveson</option>
-      <option value="Dalvan">Dalvan</option>
-    </select>
-    <input type="text" id="loja" placeholder="Número da loja" />
-    <input type="text" id="codigo" placeholder="Bipe o código" autofocus />
-    <button onclick="registrar()">Registrar</button>
-  </div>
+  <main>
+    <section id="form-section">
+      <select id="motorista">
+        <option value="">Selecione o motorista</option>
+        <option value="Silenildo">Silenildo</option>
+        <option value="Adryen">Adryen</option>
+        <option value="Priscila">Priscila</option>
+        <option value="Uelber">Uelber</option>
+        <option value="Luiz Carlos">Luiz Carlos</option>
+        <option value="Luis Gerson">Luis Gerson</option>
+        <option value="Marcio">Marcio</option>
+        <option value="Dayveson">Dayveson</option>
+        <option value="Dalvan">Dalvan</option>
+      </select>
+      <input type="text" id="loja" placeholder="Número da loja" />
+      <input type="text" id="codigo" placeholder="Bipe o código" autofocus />
+      <button onclick="registrar()">Registrar</button>
+      <p id="mensagem"></p>
+    </section>
 
-  <p id="mensagem"></p>
-
-  <div id="container-listas">
-    <div id="bipagem-atual">
+    <section id="bipagem-atual-section" class="oculto">
       <h2>📝 Bipagem Atual (<span id="contagem">0</span>)</h2>
       <ul id="lista-atual"></ul>
-    </div>
-    <div id="historico">
-      <h2>Histórico</h2>
+    </section>
+
+    <section id="historico-section" class="oculto">
+      <h2>📋 Histórico</h2>
       <ul id="lista"></ul>
-    </div>
-  </div>
+    </section>
+  </main>
 
   <script src="/static/script.js"></script>
 </body>

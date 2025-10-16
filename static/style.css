@@ -1,22 +1,73 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 20px;
+    margin: 0;
     background: #fff;
     color: #000;
 }
 
-h1 {
-    color: #c00; /* vermelho principal */
-}
-
-#form {
-    margin-bottom: 15px;
-}
-
-input, button, select {
+header {
+    background-color: #c00;
+    color: white;
     padding: 10px;
-    margin-right: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 20px;
+}
+
+#menu-btn {
+    background: white;
+    color: #c00;
+    border: none;
+    padding: 5px 10px;
+    font-size: 18px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+nav#menu {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    background: #fff;
+    width: 100%;
+    display: none;
+    flex-direction: column;
+    border-top: 1px solid #c00;
+}
+
+nav#menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+nav#menu li a {
+    display: block;
+    padding: 10px;
+    color: #c00;
+    text-decoration: none;
+    border-bottom: 1px solid #c00;
+}
+
+nav#menu li a:hover {
+    background: #f4f4f4;
+}
+
+main {
+    padding: 10px;
+}
+
+#form-section input, #form-section select, #form-section button {
+    padding: 10px;
+    margin-bottom: 5px;
     font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 button {
@@ -31,11 +82,6 @@ button:hover {
     background-color: #900;
 }
 
-#mensagem {
-    font-weight: bold;
-    margin-top: 10px;
-}
-
 ul {
     list-style: none;
     padding: 0;
@@ -48,17 +94,6 @@ li {
     border-radius: 5px;
 }
 
-#container-listas {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-#bipagem-atual, #historico {
-    flex: 1;
-    min-width: 250px;
-}
-
-h2 {
-    color: #c00;
+.oculto {
+    display: none;
 }

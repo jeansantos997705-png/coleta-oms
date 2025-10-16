@@ -1,5 +1,27 @@
 let bipagemAtual = [];
 
+const menuBtn = document.getElementById("menu-btn");
+const menu = document.getElementById("menu");
+const bipagemSection = document.getElementById("bipagem-atual-section");
+const historicoSection = document.getElementById("historico-section");
+
+menuBtn.addEventListener("click", () => {
+    menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+});
+
+function abrirBipagemAtual() {
+    bipagemSection.classList.remove("oculto");
+    historicoSection.classList.add("oculto");
+    menu.style.display = "none";
+}
+
+function abrirHistorico() {
+    historicoSection.classList.remove("oculto");
+    bipagemSection.classList.add("oculto");
+    menu.style.display = "none";
+    atualizarHistorico();
+}
+
 document.getElementById("codigo").addEventListener("keydown", function(event) {
     if (event.key === "Enter") {
         adicionarBipagem();
@@ -86,4 +108,8 @@ async function atualizarHistorico() {
     });
 }
 
-setInterval(atualizarHistorico, 3000);
+setInterval(() => {
+    if (!historicoSection.classList.contains("oculto")) {
+        atualizarHistorico();
+    }
+}, 3000);
