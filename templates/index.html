@@ -34,19 +34,22 @@
   <h2>Bipagem Atual (<span id="contador">0</span>)</h2>
   <ul id="bipagemAtual"></ul>
 
-  <!-- Menu flutuante -->
-  <div id="menu" class="menu">
-    <button onclick="fecharMenu()" class="fechar">Fechar ✖</button>
-    <h2>Menu</h2>
-    <button onclick="document.getElementById('historicoSec').style.display='block'; fecharMenu()">Histórico</button>
-    <button onclick="window.location.href='/backup'">Exportar Backup</button>
+  <!-- Tela flutuante do menu -->
+  <div id="menu" class="overlay" style="display:none;">
+    <div class="overlayContent">
+      <button onclick="fecharMenu()" class="fechar">Fechar ✖</button>
+      <h2>Menu</h2>
+      <button onclick="abrirHistorico()">Histórico</button>
+    </div>
   </div>
 
-  <!-- Histórico -->
-  <div id="historicoSec" style="display:none;">
-    <h2>Histórico de Pedidos</h2>
-    <button onclick="document.getElementById('historicoSec').style.display='none'">Voltar</button>
-    <ul id="historicoLista"></ul>
+  <!-- Tela de histórico -->
+  <div id="historicoSec" class="overlay" style="display:none;">
+    <div class="overlayContent">
+      <button onclick="fecharHistorico()" class="fechar">Voltar ✖</button>
+      <h2>Histórico de Pedidos</h2>
+      <ul id="historicoLista"></ul>
+    </div>
   </div>
 
   <script src="/static/script.js"></script>

@@ -1,101 +1,102 @@
 let bipagemAtual = [];
 
-// ===================== Menu =====================
-function abrirMenu() {
-  document.getElementById("menu").style.display = "block";
-}
-
-function fecharMenu() {
-  document.getElementById("menu").style.display = "none";
-}
-
-// ===================== Bipagem =====================
 async function adicionarCodigo() {
-  const motorista = document.getElementById("motorista").value;
-  const loja = document.getElementById("loja").value;
-  const codigoInput = document.getElementById("codigo");
-  const codigo = codigoInput.value.trim();
-  const msg = document.getElementById("mensagem");
+    const codigo = document.getElementById("codigo").value.trim();
+    const loja = document.getElementById("loja").value.trim();
+    const motorista = document.getElementById("motorista").value.trim();
+    const msg = document.getElementById("mensagem");
 
-  if (!motorista || !loja || !codigo) {
-    msg.innerText = "Preencha todos os campos!";
-    return;
-  }
+    if (!codigo || !loja || !motorista) {
+        msg.innerText = "Preencha motorista, loja e código!";
+        return;
+    }
 
-  if (codigo.length !== 12) {
-    msg.innerText = "Código deve ter 12 caracteres (incluindo o traço).";
-    return;
-  }
+    if (codigo.length !== 12 || codigo[9] !== '-') { 
+        msg.innerText = "Código inválido! Deve ter 12 caracteres com traço.";
+        return;
+    }
 
-  bipagemAtual.push({ motorista, loja, codigo });
-  atualizarBipagemAtual();
-  codigoInput.value = "";
-  codigoInput.focus();
-  msg.innerText = "";
+    if (bipagemAtual.includes(codigo)) {
+        msg.innerText = `Código ${codigo} já adicionado nesta bipagem!`;
+        return;
+    }
+
+    bipagemAtual.push(codigo);
+    atualizarBipagemAtual();
+    document.getElementById("codigo").value = "";
+    document.getElementById("contador").innerText = bipagemAtual.length;
+    msg.innerText = "";
 }
 
 function atualizarBipagemAtual() {
-  const lista = document.getElementById("bipagemAtual");
-  lista.innerHTML = "";
-  bipagemAtual.forEach((item) => {
-    const li = document.createElement("li");
-    li.textContent = `${item.codigo} (${item.loja})`;
-    lista.appendChild(li);
-  });
-  document.getElementById("contador").innerText = bipagemAtual.length;
+    const lista = document.getElementById("bipagemAtual");
+    lista.innerHTML = "";
+    bipagemAtual.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        lista.appendChild(li);
+    });
 }
 
 async function registrarTudo() {
-  const msg = document.getElementById("mensagem");
-  if (bipagemAtual.length === 0) {
-    msg.innerText = "Nenhum código para registrar!";
-    return;
-  }
+    const loja = document.getElementById("loja").value.trim();
+    const motorista = document.getElementById("motorista").value.trim();
+    const msg = document.getElementById("mensagem");
 
-  for (let item of bipagemAtual) {
-    await fetch("/registrar", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(item),
+    if (!loja || !motorista || bipagemAtual.length === 0) {
+        msg.innerText = "Preencha tudo e adicione pelo menos um código!";
+        return;
+    }
+
+    for (const codigo of bipagemAtual) {
+        await fetch("/registrar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ codigo, motorista, loja })
+        });
+    }
+
+    bipagemAtual = [];
+    atualizarBipagemAtual();
+    document.getElementById("contador").innerText = 0;
+    msg.innerText = "Todos os códigos registrados com sucesso!";
+    atualizarHistorico();
+}
+
+// Menu e histórico
+function abrirMenu() {
+    document.getElementById("menu").style.display = "block";
+}
+
+function fecharMenu() {
+    document.getElementById("menu").style.display = "none";
+}
+
+function abrirHistorico() {
+    fecharMenu();
+    document.getElementById("historicoSec").style.display = "block";
+    atualizarHistorico();
+}
+
+function fecharHistorico() {
+    document.getElementById("historicoSec").style.display = "none";
+}
+
+async function atualizarHistorico() {
+    const resp = await fetch("/listar");
+    const dados = await resp.json();
+    const lista = document.getElementById("historicoLista");
+    lista.innerHTML = "";
+    dados.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.data} - ${item.motorista} - Loja ${item.loja} - ${item.codigo}`;
+        lista.appendChild(li);
     });
-  }
-
-  bipagemAtual = [];
-  atualizarBipagemAtual();
-  msg.innerText = "Bipagem registrada com sucesso!";
-  carregarHistorico();
 }
 
-// ===================== Histórico =====================
-async function carregarHistorico() {
-  const resp = await fetch("/historico");
-  const data = await resp.json();
-  const lista = document.getElementById("historicoLista");
-  lista.innerHTML = "";
-
-  for (let chave in data) {
-    const pedidos = data[chave];
-    const li = document.createElement("li");
-    li.innerHTML = `<strong>${chave}</strong> - ${pedidos.length} pedidos
-                    <button onclick="copiarPedidos('${chave}')">Copiar pedidos</button>`;
-    lista.appendChild(li);
-  }
-}
-
-function copiarPedidos(chave) {
-  fetch(`/historico`).then(resp => resp.json()).then(data => {
-    const pedidos = data[chave];
-    navigator.clipboard.writeText(pedidos.join("\n")).then(() => {
-      alert("Pedidos copiados!");
-    });
-  });
-}
-
-// ===================== Eventos =====================
-document.getElementById("codigo").addEventListener("keydown", function (e) {
-  if (e.key === "Enter") {
-    adicionarCodigo();
-  }
+// Adiciona enter para adicionar código
+document.getElementById("codigo").addEventListener("keyup", function(event) {
+    if (event.key === "Enter") {
+        adicionarCodigo();
+    }
 });
-
-window.addEventListener("load", carregarHistorico);
