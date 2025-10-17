@@ -1,61 +1,73 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 10px;
-    background: #fff;
-    color: #333;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  color: #333;
 }
 
-h1, h2 {
-    color: #d32f2f;
+header {
+  background: #c00;
+  color: white;
+  text-align: center;
+  padding: 15px;
+}
+
+h1, h2, h3 {
+  margin: 0 0 10px 0;
 }
 
 #form {
-    margin-bottom: 15px;
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
 }
 
 input, select, button {
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+  padding: 10px;
+  margin: 2px 0;
+  font-size: 16px;
 }
 
-button {
-    background-color: #d32f2f;
-    color: white;
-    border: none;
-    cursor: pointer;
+#bipagem-atual, #historico-page {
+  padding: 10px;
 }
 
-button:hover {
-    background-color: #b71c1c;
+ul {
+  list-style: none;
+  padding: 0;
 }
 
-#bipagem-atual, #historico {
-    background: #f4f4f4;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
+li, .coleta-item {
+  background: #f9f9f9;
+  margin: 5px 0;
+  padding: 8px;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-#lista-bipagem li, #lista-historico li {
-    background: #fff;
-    padding: 8px;
-    margin-bottom: 4px;
-    border-radius: 5px;
+.coleta-item:hover {
+  background: #eee;
 }
 
 .hidden {
-    display: none;
+  display: none;
 }
 
-#menu {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.95);
-    z-index: 1000;
-    padding: 20px;
+button {
+  background: #c00;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #900;
+}
+
+#historico-lista {
+  max-height: 400px;
+  overflow-y: auto;
 }

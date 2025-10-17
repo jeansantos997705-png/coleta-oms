@@ -1,54 +1,56 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>📦 Controle de Coletas</title>
-  <link rel="stylesheet" href="/static/style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de Coletas</title>
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <h1>📦 Controle de Coletas</h1>
+  <header>
+    <h1>📦 Controle de Coletas</h1>
+  </header>
 
-  <div id="form">
-    <input type="text" id="loja" placeholder="Número da Loja" />
-    <select id="motorista">
-      <option value="">Selecione o motorista</option>
-      <option value="Silenildo">Silenildo</option>
-      <option value="Adryen">Adryen</option>
-      <option value="Priscila">Priscila</option>
-      <option value="Uelber">Uelber</option>
-      <option value="Luiz Carlos">Luiz Carlos</option>
-      <option value="Luis Gerson">Luis Gerson</option>
-      <option value="Marcio">Marcio</option>
-      <option value="Dayveson">Dayveson</option>
-      <option value="Dalvan">Dalvan</option>
-    </select>
-    <input type="text" id="codigo" placeholder="Bipe o código" autofocus />
-    <button id="addBtn">Adicionar</button>
-    <button onclick="registrar()">Registrar</button>
-  </div>
+  <div id="main-page">
+    <div id="form">
+      <select id="motorista">
+        <option value="">Selecione o motorista</option>
+        <option value="Silenildo">Silenildo</option>
+        <option value="Adryen">Adryen</option>
+        <option value="Priscila">Priscila</option>
+        <option value="Uelber">Uelber</option>
+        <option value="Luiz Carlos">Luiz Carlos</option>
+        <option value="Luis Gerson">Luis Gerson</option>
+        <option value="Marcio">Marcio</option>
+        <option value="Dayveson">Dayveson</option>
+        <option value="Dalvan">Dalvan</option>
+      </select>
+      <input type="text" id="loja" placeholder="Número da loja" />
+      <input type="text" id="codigo" placeholder="Bipe o código" autofocus />
+      <button onclick="adicionarCodigo()">Adicionar</button>
+      <button onclick="registrar()">Registrar Coleta</button>
+    </div>
 
-  <p id="mensagem"></p>
+    <p id="mensagem"></p>
 
-  <div id="coletas-container">
     <div id="bipagem-atual">
-      <h2>📋 Bipagem Atual</h2>
+      <h2>Bipagem Atual (<span id="contador">0</span>)</h2>
       <ul id="lista-bipagem"></ul>
-      <p>Total: <span id="contador">0</span></p>
     </div>
 
-    <div id="historico" class="hidden">
-      <h2>📜 Histórico de Coletas</h2>
-      <ul id="lista-historico"></ul>
+    <button id="btn-historico" onclick="abrirHistorico()">📜 Histórico</button>
+  </div>
+
+  <!-- Página de histórico -->
+  <div id="historico-page" class="hidden">
+    <button onclick="fecharHistorico()">← Voltar</button>
+    <h2>Histórico de Coletas</h2>
+    <div id="historico-lista"></div>
+    <div id="pedidos-detalhes" class="hidden">
+      <h3>Pedidos da coleta</h3>
+      <ul id="pedidos-lista"></ul>
     </div>
   </div>
-
-  <div id="menu" class="hidden">
-    <h2>Menu</h2>
-    <button onclick="abrirHistorico()">Histórico</button>
-    <button onclick="fecharMenu()">Fechar</button>
-  </div>
-
-  <button id="menuBtn">☰ Menu</button>
 
   <script src="/static/script.js"></script>
 </body>
