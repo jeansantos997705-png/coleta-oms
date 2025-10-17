@@ -1,95 +1,47 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Controle de Coletas</title>
-  <link rel="stylesheet" href="/static/style.css" />
+  <meta charset="UTF-8">
+  <title>Controle de Coleta</title>
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <header class="topbar">
-    <h1>📦 Coletas</h1>
-    <button id="btnMenu" class="btn small">Menu</button>
+  <header>
+    <h1>Controle de Coleta</h1>
+    <button id="menuBtn">☰</button>
   </header>
 
-  <main class="container">
-    <!-- Form -->
-    <section class="card">
-      <label>Motorista</label>
-      <select id="motorista" class="input">
-        <option value="">Selecione</option>
-        <option>Silenildo</option>
-        <option>Adryen</option>
-        <option>Priscila</option>
-        <option>Uelber</option>
-        <option>Luiz Carlos</option>
-        <option>Luis Gerson</option>
-        <option>Marcio</option>
-        <option>Dayveson</option>
-        <option>Dalvan</option>
-      </select>
+  <main id="mainScreen">
+    <div class="input-section">
+      <label>Motorista:</label>
+      <input type="text" id="motorista" placeholder="Nome do motorista">
+      <label>Loja:</label>
+      <input type="text" id="loja" placeholder="Nome da loja">
 
-      <label>Loja</label>
-      <input id="loja" class="input" placeholder="Número da loja" />
+      <label>Código do Pedido:</label>
+      <input type="text" id="codigo" placeholder="Bipe ou digite o código">
+      <button id="addBtn">Adicionar</button>
 
-      <label>Bipe o código</label>
-      <input id="codigo" class="input" placeholder="000000000-00" maxlength="12" autofocus />
-
-      <div class="row">
-        <button id="btnAdd" class="btn">Adicionar</button>
-        <button id="btnRegistrar" class="btn primary">Registrar</button>
+      <div class="contador">
+        <p>Total bipado: <span id="contador">0</span></p>
       </div>
 
-      <p id="mensagem" class="mensagem"></p>
-    </section>
+      <ul id="listaCodigos"></ul>
 
-    <!-- Bipagem atual -->
-    <section class="card">
-      <h2>Bipagem Atual <span id="contador" class="badge">0</span></h2>
-      <ul id="bipagemAtual" class="list"></ul>
-    </section>
+      <button id="registrarBtn">Registrar</button>
+    </div>
   </main>
 
-  <!-- Menu overlay (abre sobre a tela) -->
-  <div id="menuOverlay" class="overlay hidden">
-    <div class="overlayBox">
-      <h3>Menu</h3>
-      <button id="btnHistorico" class="btn">Histórico</button>
-      <button id="btnExport" class="btn">Exportar Backup (Excel)</button>
-      <button id="btnCloseMenu" class="btn small">Fechar</button>
-    </div>
+  <div id="menuScreen" class="hidden">
+    <h2>Menu</h2>
+    <button id="historicoBtn">Histórico de Pedidos</button>
+    <button id="voltarBtn">Voltar</button>
   </div>
 
-  <!-- Histórico overlay -->
-  <div id="historicoOverlay" class="overlay hidden">
-    <div class="overlayBox large">
-      <h3>Histórico de Coletas</h3>
-
-      <div class="filtros">
-        <select id="filtroMotorista" class="input small">
-          <option value="">Todos Motoristas</option>
-          <option>Silenildo</option><option>Adryen</option><option>Priscila</option>
-          <option>Uelber</option><option>Luiz Carlos</option><option>Luis Gerson</option>
-          <option>Marcio</option><option>Dayveson</option><option>Dalvan</option>
-        </select>
-        <input id="filtroLoja" class="input small" placeholder="Loja" />
-        <input id="filtroData" type="date" class="input small" />
-        <button id="btnFiltrar" class="btn small">Filtrar</button>
-      </div>
-
-      <ul id="listaHistorico" class="list"></ul>
-
-      <div id="detalhesBox" class="card hidden">
-        <h4>Pedidos da Coleta</h4>
-        <ul id="listaDetalhes" class="list"></ul>
-        <div class="row">
-          <button id="btnCopiar" class="btn">Copiar Pedidos</button>
-          <button id="btnFecharDetalhes" class="btn small">Fechar</button>
-        </div>
-      </div>
-
-      <button id="btnCloseHistorico" class="btn small">Fechar histórico</button>
-    </div>
+  <div id="historicoScreen" class="hidden">
+    <h2>Histórico de Pedidos</h2>
+    <ul id="listaHistorico"></ul>
+    <button id="voltarMenuBtn">Voltar ao Menu</button>
   </div>
 
   <script src="/static/script.js"></script>
