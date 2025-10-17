@@ -1,65 +1,95 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Controle de Coletas</title>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-  <h1>📦 Controle de Coletas</h1>
+  <header class="topbar">
+    <h1>📦 Coletas</h1>
+    <button id="btnMenu" class="btn small">Menu</button>
+  </header>
 
-  <div id="form">
-    <select id="motorista">
-      <option value="">Selecione motorista</option>
-      <option value="Silenildo">Silenildo</option>
-      <option value="Adryen">Adryen</option>
-      <option value="Priscila">Priscila</option>
-      <option value="Uelber">Uelber</option>
-      <option value="Luiz Carlos">Luiz Carlos</option>
-      <option value="Luis Gerson">Luis Gerson</option>
-      <option value="Marcio">Marcio</option>
-      <option value="Dayveson">Dayveson</option>
-      <option value="Dalvan">Dalvan</option>
-    </select>
-    <input type="text" id="loja" placeholder="Número da loja" />
-    <input type="text" id="codigo" placeholder="Bipe o código" autofocus />
-    <button onclick="adicionarBipagem()">Adicionar</button>
-  </div>
-
-  <p id="mensagem"></p>
-
-  <h2>Bipagem Atual (<span id="contador">0</span>)</h2>
-  <ul id="bipagem-atual"></ul>
-
-  <button id="btn-menu" onclick="abrirMenu()">Menu</button>
-
-  <div id="menu" class="menu-oculto">
-    <h2>Menu</h2>
-    <button onclick="abrirHistorico()">Histórico</button>
-    <button onclick="fecharMenu()">Fechar</button>
-  </div>
-
-  <div id="historico-tela" class="menu-oculto">
-    <h2>Histórico de Coletas</h2>
-    <div id="historico-filtros">
-      <select id="filtro-motorista">
-        <option value="">Todos Motoristas</option>
-        <option value="Silenildo">Silenildo</option>
-        <option value="Adryen">Adryen</option>
-        <option value="Priscila">Priscila</option>
-        <option value="Uelber">Uelber</option>
-        <option value="Luiz Carlos">Luiz Carlos</option>
-        <option value="Luis Gerson">Luis Gerson</option>
-        <option value="Marcio">Marcio</option>
-        <option value="Dayveson">Dayveson</option>
-        <option value="Dalvan">Dalvan</option>
+  <main class="container">
+    <!-- Form -->
+    <section class="card">
+      <label>Motorista</label>
+      <select id="motorista" class="input">
+        <option value="">Selecione</option>
+        <option>Silenildo</option>
+        <option>Adryen</option>
+        <option>Priscila</option>
+        <option>Uelber</option>
+        <option>Luiz Carlos</option>
+        <option>Luis Gerson</option>
+        <option>Marcio</option>
+        <option>Dayveson</option>
+        <option>Dalvan</option>
       </select>
-      <input type="text" id="filtro-loja" placeholder="Número da loja">
-      <input type="date" id="filtro-data">
-      <button onclick="filtrarHistorico()">Filtrar</button>
+
+      <label>Loja</label>
+      <input id="loja" class="input" placeholder="Número da loja" />
+
+      <label>Bipe o código</label>
+      <input id="codigo" class="input" placeholder="000000000-00" maxlength="12" autofocus />
+
+      <div class="row">
+        <button id="btnAdd" class="btn">Adicionar</button>
+        <button id="btnRegistrar" class="btn primary">Registrar</button>
+      </div>
+
+      <p id="mensagem" class="mensagem"></p>
+    </section>
+
+    <!-- Bipagem atual -->
+    <section class="card">
+      <h2>Bipagem Atual <span id="contador" class="badge">0</span></h2>
+      <ul id="bipagemAtual" class="list"></ul>
+    </section>
+  </main>
+
+  <!-- Menu overlay (abre sobre a tela) -->
+  <div id="menuOverlay" class="overlay hidden">
+    <div class="overlayBox">
+      <h3>Menu</h3>
+      <button id="btnHistorico" class="btn">Histórico</button>
+      <button id="btnExport" class="btn">Exportar Backup (Excel)</button>
+      <button id="btnCloseMenu" class="btn small">Fechar</button>
     </div>
-    <ul id="lista-historico"></ul>
-    <button onclick="fecharHistorico()">Fechar Histórico</button>
+  </div>
+
+  <!-- Histórico overlay -->
+  <div id="historicoOverlay" class="overlay hidden">
+    <div class="overlayBox large">
+      <h3>Histórico de Coletas</h3>
+
+      <div class="filtros">
+        <select id="filtroMotorista" class="input small">
+          <option value="">Todos Motoristas</option>
+          <option>Silenildo</option><option>Adryen</option><option>Priscila</option>
+          <option>Uelber</option><option>Luiz Carlos</option><option>Luis Gerson</option>
+          <option>Marcio</option><option>Dayveson</option><option>Dalvan</option>
+        </select>
+        <input id="filtroLoja" class="input small" placeholder="Loja" />
+        <input id="filtroData" type="date" class="input small" />
+        <button id="btnFiltrar" class="btn small">Filtrar</button>
+      </div>
+
+      <ul id="listaHistorico" class="list"></ul>
+
+      <div id="detalhesBox" class="card hidden">
+        <h4>Pedidos da Coleta</h4>
+        <ul id="listaDetalhes" class="list"></ul>
+        <div class="row">
+          <button id="btnCopiar" class="btn">Copiar Pedidos</button>
+          <button id="btnFecharDetalhes" class="btn small">Fechar</button>
+        </div>
+      </div>
+
+      <button id="btnCloseHistorico" class="btn small">Fechar histórico</button>
+    </div>
   </div>
 
   <script src="/static/script.js"></script>
