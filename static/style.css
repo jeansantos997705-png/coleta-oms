@@ -1,41 +1,61 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 20px;
+    margin: 10px;
     background: #fff;
-    color: #222;
+    color: #333;
 }
 
 h1, h2 {
-    color: #b00; /* vermelho da empresa */
+    color: #d32f2f;
+}
+
+#form {
+    margin-bottom: 15px;
 }
 
 input, select, button {
     padding: 10px;
-    margin-right: 5px;
+    margin: 5px 0;
     border-radius: 5px;
-    border: 1px solid #b00;
+    border: 1px solid #ccc;
 }
 
 button {
-    background-color: #b00;
-    color: #fff;
+    background-color: #d32f2f;
+    color: white;
+    border: none;
     cursor: pointer;
 }
 
-.container {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
+button:hover {
+    background-color: #b71c1c;
 }
 
-ul {
-    list-style: none;
-    padding-left: 0;
+#bipagem-atual, #historico {
+    background: #f4f4f4;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
 }
 
-li {
-    padding: 5px;
-    margin-bottom: 2px;
-    background: #f9f9f9;
-    border-radius: 4px;
+#lista-bipagem li, #lista-historico li {
+    background: #fff;
+    padding: 8px;
+    margin-bottom: 4px;
+    border-radius: 5px;
+}
+
+.hidden {
+    display: none;
+}
+
+#menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    z-index: 1000;
+    padding: 20px;
 }

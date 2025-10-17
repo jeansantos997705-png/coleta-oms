@@ -1,79 +1,55 @@
 from flask import Flask, render_template, request, jsonify
 import sqlite3
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 
-DB_PATH = 'data.db'
+DB_FILE = "coletas.db"
 
-# --- Função auxiliar para conectar ao banco ---
-def get_db_connection():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-# --- Cria a tabela se não existir ---
-def init_db():
-    conn = get_db_connection()
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS coletas (
+# Criação da tabela caso não exista
+def criar_db():
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS registros (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            codigo TEXT NOT NULL UNIQUE,
-            motorista TEXT NOT NULL,
-            loja TEXT NOT NULL,
-            data TEXT NOT NULL
+            codigo TEXT,
+            loja TEXT,
+            motorista TEXT,
+            data TEXT
         )
     ''')
     conn.commit()
     conn.close()
 
-init_db()
+criar_db()
 
-# --- Página inicial ---
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
-# --- Endpoint para registrar códigos ---
-@app.route('/registrar', methods=['POST'])
+@app.route("/registrar", methods=["POST"])
 def registrar():
-    data = request.get_json()
-    motorista = data.get('motorista')
-    loja = data.get('loja')
-    codigos = data.get('codigos')  # lista de códigos
-
-    if not motorista or not loja or not codigos:
-        return jsonify({'status': 'erro', 'mensagem': 'Preencha motorista, loja e códigos!'})
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-    mensagens = []
-
-    for codigo in codigos:
-        # Verifica duplicidade
-        cur.execute('SELECT * FROM coletas WHERE codigo = ?', (codigo,))
-        existente = cur.fetchone()
-        if existente:
-            mensagens.append(f'Código {codigo} já registrado!')
-            continue
-
-        # Insere novo código
-        data_atual = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        cur.execute('INSERT INTO coletas (codigo, motorista, loja, data) VALUES (?, ?, ?, ?)',
-                    (codigo, motorista, loja, data_atual))
-        mensagens.append(f'Código {codigo} registrado!')
-
+    dados = request.get_json()
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    for item in dados:
+        c.execute("INSERT INTO registros (codigo, loja, motorista, data) VALUES (?, ?, ?, ?)",
+                  (item["codigo"], item["loja"], item["motorista"], datetime.now().strftime("%Y-%m-%d %H:%M")))
     conn.commit()
     conn.close()
-    return jsonify({'status': 'ok', 'mensagem': mensagens})
+    return jsonify({"mensagem": f"{len(dados)} pedidos registrados com sucesso!"})
 
-# --- Endpoint para listar registros ---
-@app.route('/listar')
+@app.route("/listar")
 def listar():
-    conn = get_db_connection()
-    coletas = conn.execute('SELECT * FROM coletas ORDER BY data DESC').fetchall()
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute("SELECT codigo, loja, motorista, data FROM registros ORDER BY id DESC")
+    linhas = c.fetchall()
     conn.close()
-    return jsonify([dict(row) for row in coletas])
+    resultado = [{"codigo": l[0], "loja": l[1], "motorista": l[2], "data": l[3]} for l in linhas]
+    return jsonify(resultado)
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))

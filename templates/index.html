@@ -2,13 +2,14 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Controle de Coletas</title>
+  <title>📦 Controle de Coletas</title>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
   <h1>📦 Controle de Coletas</h1>
 
   <div id="form">
+    <input type="text" id="loja" placeholder="Número da Loja" />
     <select id="motorista">
       <option value="">Selecione o motorista</option>
       <option value="Silenildo">Silenildo</option>
@@ -21,25 +22,33 @@
       <option value="Dayveson">Dayveson</option>
       <option value="Dalvan">Dalvan</option>
     </select>
-    <input type="text" id="loja" placeholder="Número da loja" />
     <input type="text" id="codigo" placeholder="Bipe o código" autofocus />
-    <button onclick="adicionarCodigo()">Adicionar</button>
+    <button id="addBtn">Adicionar</button>
     <button onclick="registrar()">Registrar</button>
   </div>
 
   <p id="mensagem"></p>
 
-  <div class="container">
-    <div>
-      <h2>Coleta Atual</h2>
-      <ul id="coletaAtual"></ul>
-      <p>Total: <span id="total">0</span></p>
+  <div id="coletas-container">
+    <div id="bipagem-atual">
+      <h2>📋 Bipagem Atual</h2>
+      <ul id="lista-bipagem"></ul>
+      <p>Total: <span id="contador">0</span></p>
     </div>
-    <div>
-      <h2>Histórico de Coletas</h2>
-      <ul id="lista"></ul>
+
+    <div id="historico" class="hidden">
+      <h2>📜 Histórico de Coletas</h2>
+      <ul id="lista-historico"></ul>
     </div>
   </div>
+
+  <div id="menu" class="hidden">
+    <h2>Menu</h2>
+    <button onclick="abrirHistorico()">Histórico</button>
+    <button onclick="fecharMenu()">Fechar</button>
+  </div>
+
+  <button id="menuBtn">☰ Menu</button>
 
   <script src="/static/script.js"></script>
 </body>
