@@ -1,83 +1,79 @@
 from flask import Flask, render_template, request, jsonify
 import sqlite3
 from datetime import datetime
-import os
 
 app = Flask(__name__)
 
-# Garante que o banco fique salvo na pasta atual
-DB_PATH = os.path.join(os.path.dirname(__file__), 'data.db')
+DB_PATH = 'data.db'
 
-# Cria o banco se não existir
+# --- Função auxiliar para conectar ao banco ---
+def get_db_connection():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+# --- Cria a tabela se não existir ---
 def init_db():
-    with sqlite3.connect(DB_PATH) as conn:
-        cursor = conn.cursor()
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS pedidos (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                motorista TEXT,
-                loja TEXT,
-                codigo TEXT,
-                data TEXT
-            )
-        ''')
-        conn.commit()
+    conn = get_db_connection()
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS coletas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            codigo TEXT NOT NULL UNIQUE,
+            motorista TEXT NOT NULL,
+            loja TEXT NOT NULL,
+            data TEXT NOT NULL
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
 init_db()
 
-
+# --- Página inicial ---
 @app.route('/')
 def index():
     return render_template('index.html')
 
-
+# --- Endpoint para registrar códigos ---
 @app.route('/registrar', methods=['POST'])
 def registrar():
     data = request.get_json()
     motorista = data.get('motorista')
     loja = data.get('loja')
-    codigos = data.get('codigos', [])
+    codigos = data.get('codigos')  # lista de códigos
 
     if not motorista or not loja or not codigos:
-        return jsonify({'status': 'erro', 'mensagem': 'Dados incompletos'})
+        return jsonify({'status': 'erro', 'mensagem': 'Preencha motorista, loja e códigos!'})
 
-    data_registro = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn = get_db_connection()
+    cur = conn.cursor()
+    mensagens = []
 
-    with sqlite3.connect(DB_PATH) as conn:
-        cursor = conn.cursor()
-        for codigo in codigos:
-            cursor.execute(
-                'INSERT INTO pedidos (motorista, loja, codigo, data) VALUES (?, ?, ?, ?)',
-                (motorista, loja, codigo, data_registro)
-            )
-        conn.commit()
+    for codigo in codigos:
+        # Verifica duplicidade
+        cur.execute('SELECT * FROM coletas WHERE codigo = ?', (codigo,))
+        existente = cur.fetchone()
+        if existente:
+            mensagens.append(f'Código {codigo} já registrado!')
+            continue
 
-    return jsonify({'status': 'sucesso', 'mensagem': 'Pedidos registrados com sucesso!'})
+        # Insere novo código
+        data_atual = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        cur.execute('INSERT INTO coletas (codigo, motorista, loja, data) VALUES (?, ?, ?, ?)',
+                    (codigo, motorista, loja, data_atual))
+        mensagens.append(f'Código {codigo} registrado!')
 
+    conn.commit()
+    conn.close()
+    return jsonify({'status': 'ok', 'mensagem': mensagens})
 
-@app.route('/historico')
-def historico():
-    with sqlite3.connect(DB_PATH) as conn:
-        cursor = conn.cursor()
-        cursor.execute('SELECT motorista, loja, data, COUNT(codigo) FROM pedidos GROUP BY motorista, loja, data ORDER BY id DESC')
-        registros = cursor.fetchall()
-    return jsonify(registros)
-
-
-@app.route('/detalhes', methods=['POST'])
-def detalhes():
-    data = request.get_json()
-    motorista = data.get('motorista')
-    loja = data.get('loja')
-    data_pedido = data.get('data')
-
-    with sqlite3.connect(DB_PATH) as conn:
-        cursor = conn.cursor()
-        cursor.execute('SELECT codigo FROM pedidos WHERE motorista=? AND loja=? AND data=?', (motorista, loja, data_pedido))
-        codigos = [row[0] for row in cursor.fetchall()]
-
-    return jsonify(codigos)
-
+# --- Endpoint para listar registros ---
+@app.route('/listar')
+def listar():
+    conn = get_db_connection()
+    coletas = conn.execute('SELECT * FROM coletas ORDER BY data DESC').fetchall()
+    conn.close()
+    return jsonify([dict(row) for row in coletas])
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)
+    app.run(debug=True, host='0.0.0.0', port=5000)

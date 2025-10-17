@@ -1,47 +1,44 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Controle de Coleta</title>
-  <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8" />
+  <title>Controle de Coletas</title>
+  <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-  <header>
-    <h1>Controle de Coleta</h1>
-    <button id="menuBtn">☰</button>
-  </header>
+  <h1>📦 Controle de Coletas</h1>
 
-  <main id="mainScreen">
-    <div class="input-section">
-      <label>Motorista:</label>
-      <input type="text" id="motorista" placeholder="Nome do motorista">
-      <label>Loja:</label>
-      <input type="text" id="loja" placeholder="Nome da loja">
-
-      <label>Código do Pedido:</label>
-      <input type="text" id="codigo" placeholder="Bipe ou digite o código">
-      <button id="addBtn">Adicionar</button>
-
-      <div class="contador">
-        <p>Total bipado: <span id="contador">0</span></p>
-      </div>
-
-      <ul id="listaCodigos"></ul>
-
-      <button id="registrarBtn">Registrar</button>
-    </div>
-  </main>
-
-  <div id="menuScreen" class="hidden">
-    <h2>Menu</h2>
-    <button id="historicoBtn">Histórico de Pedidos</button>
-    <button id="voltarBtn">Voltar</button>
+  <div id="form">
+    <select id="motorista">
+      <option value="">Selecione o motorista</option>
+      <option value="Silenildo">Silenildo</option>
+      <option value="Adryen">Adryen</option>
+      <option value="Priscila">Priscila</option>
+      <option value="Uelber">Uelber</option>
+      <option value="Luiz Carlos">Luiz Carlos</option>
+      <option value="Luis Gerson">Luis Gerson</option>
+      <option value="Marcio">Marcio</option>
+      <option value="Dayveson">Dayveson</option>
+      <option value="Dalvan">Dalvan</option>
+    </select>
+    <input type="text" id="loja" placeholder="Número da loja" />
+    <input type="text" id="codigo" placeholder="Bipe o código" autofocus />
+    <button onclick="adicionarCodigo()">Adicionar</button>
+    <button onclick="registrar()">Registrar</button>
   </div>
 
-  <div id="historicoScreen" class="hidden">
-    <h2>Histórico de Pedidos</h2>
-    <ul id="listaHistorico"></ul>
-    <button id="voltarMenuBtn">Voltar ao Menu</button>
+  <p id="mensagem"></p>
+
+  <div class="container">
+    <div>
+      <h2>Coleta Atual</h2>
+      <ul id="coletaAtual"></ul>
+      <p>Total: <span id="total">0</span></p>
+    </div>
+    <div>
+      <h2>Histórico de Coletas</h2>
+      <ul id="lista"></ul>
+    </div>
   </div>
 
   <script src="/static/script.js"></script>
