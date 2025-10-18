@@ -1,55 +1,58 @@
 from flask import Flask, render_template, request, jsonify
-import sqlite3
+from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///coletas.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
-DB_FILE = "coletas.db"
+class Coleta(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    motorista = db.Column(db.String(50))
+    loja = db.Column(db.String(20))
+    data = db.Column(db.String(20))
+    hora = db.Column(db.String(10))
+    pedidos = db.Column(db.Text)  # armazenar JSON como string
 
-# Criação da tabela caso não exista
-def criar_db():
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS registros (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            codigo TEXT,
-            loja TEXT,
-            motorista TEXT,
-            data TEXT
-        )
-    ''')
-    conn.commit()
-    conn.close()
+db.create_all()
 
-criar_db()
-
-@app.route("/")
+@app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template('index.html')
 
-@app.route("/registrar", methods=["POST"])
+@app.route('/registrar', methods=['POST'])
 def registrar():
-    dados = request.get_json()
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    for item in dados:
-        c.execute("INSERT INTO registros (codigo, loja, motorista, data) VALUES (?, ?, ?, ?)",
-                  (item["codigo"], item["loja"], item["motorista"], datetime.now().strftime("%Y-%m-%d %H:%M")))
-    conn.commit()
-    conn.close()
-    return jsonify({"mensagem": f"{len(dados)} pedidos registrados com sucesso!"})
+    data = request.get_json()
+    motorista = data['motorista']
+    loja = data['loja']
+    pedidos = data['pedidos']
+    now = datetime.now()
+    nova_coleta = Coleta(
+        motorista=motorista,
+        loja=loja,
+        data=now.strftime('%Y-%m-%d'),
+        hora=now.strftime('%H:%M'),
+        pedidos=','.join(pedidos)
+    )
+    db.session.add(nova_coleta)
+    db.session.commit()
+    return jsonify({'status':'ok'})
 
-@app.route("/listar")
-def listar():
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("SELECT codigo, loja, motorista, data FROM registros ORDER BY id DESC")
-    linhas = c.fetchall()
-    conn.close()
-    resultado = [{"codigo": l[0], "loja": l[1], "motorista": l[2], "data": l[3]} for l in linhas]
-    return jsonify(resultado)
+@app.route('/registro')
+def registro():
+    coletas = Coleta.query.order_by(Coleta.id.desc()).all()
+    result = []
+    for c in coletas:
+        result.append({
+            'motorista': c.motorista,
+            'loja': c.loja,
+            'data': c.data,
+            'hora': c.hora,
+            'pedidos': c.pedidos.split(',')
+        })
+    return jsonify(result)
 
-if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)

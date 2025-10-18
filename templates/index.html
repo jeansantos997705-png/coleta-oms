@@ -7,9 +7,13 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Página principal -->
-  <div id="main-page">
-    <h1>Coleta Atual</h1>
+  <!-- Página de bipagem -->
+  <div id="bipagem-page">
+    <header>
+      <h1>Coleta de Pedidos</h1>
+      <button id="btn-registro" onclick="abrirRegistro()">Registro</button>
+    </header>
+
     <div class="form-group">
       <label for="motorista">Motorista:</label>
       <select id="motorista">
@@ -37,32 +41,26 @@
     </div>
 
     <button onclick="adicionarCodigo()">Adicionar</button>
-    <button onclick="registrar()">Registrar</button>
     <span id="contador">0</span> pedidos adicionados
     <p id="mensagem" class="mensagem"></p>
 
     <ul id="lista-bipagem"></ul>
-    <button onclick="abrirHistorico()">Histórico</button>
+    <button onclick="registrar()">Enviar para o sistema</button>
   </div>
 
-  <!-- Página de histórico -->
-  <div id="historico-page" class="hidden">
-    <h1>Histórico de Coletas</h1>
-    <div>
-      <input type="text" id="filtro-motorista" placeholder="Filtrar por motorista">
-      <input type="text" id="filtro-loja" placeholder="Filtrar por loja">
-      <input type="date" id="filtro-data">
-      <button onclick="aplicarFiltros()">Aplicar filtros</button>
-    </div>
-    <div id="historico-lista"></div>
+  <!-- Página de registro -->
+  <div id="registro-page" class="hidden">
+    <header>
+      <h1>Registro de Coletas</h1>
+      <button onclick="fecharRegistro()">Voltar</button>
+    </header>
+    <div id="registro-lista"></div>
 
     <div id="pedidos-detalhes" class="hidden">
       <h2>Pedidos da Coleta</h2>
       <ul id="pedidos-lista"></ul>
       <button onclick="copiarPedidos()">Copiar todos os pedidos</button>
     </div>
-
-    <button onclick="fecharHistorico()">Voltar</button>
   </div>
 
   <script src="script.js"></script>

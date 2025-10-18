@@ -1,11 +1,9 @@
 let listaBipagem = [];
-let historico = [];
-
-const codigoInput = document.getElementById('codigo');
 const listaUl = document.getElementById('lista-bipagem');
 const contador = document.getElementById('contador');
 const mensagem = document.getElementById('mensagem');
 
+const codigoInput = document.getElementById('codigo');
 codigoInput.addEventListener('keypress', function(e) {
   if (e.key === 'Enter') {
     adicionarCodigo();
@@ -14,8 +12,13 @@ codigoInput.addEventListener('keypress', function(e) {
 
 function adicionarCodigo() {
   const codigo = codigoInput.value.trim();
-  if (!/^.{11,12}$/.test(codigo)) {
+  if (!/^.{12}$/.test(codigo)) {
     mensagem.textContent = "Código inválido";
+    mensagem.style.color = "red";
+    return;
+  }
+  if (listaBipagem.includes(codigo)) {
+    mensagem.textContent = "Código duplicado";
     mensagem.style.color = "red";
     return;
   }
@@ -27,69 +30,74 @@ function adicionarCodigo() {
 
 function atualizarLista() {
   listaUl.innerHTML = '';
-  listaBipagem.forEach(codigo => {
+  listaBipagem.forEach(c => {
     const li = document.createElement('li');
-    li.textContent = codigo;
+    li.textContent = c;
     listaUl.appendChild(li);
   });
   contador.textContent = listaBipagem.length;
 }
 
-function registrar() {
+async function registrar() {
   const motorista = document.getElementById('motorista').value;
   const loja = document.getElementById('loja').value;
   if (!motorista || !loja || listaBipagem.length === 0) {
-    mensagem.textContent = "Preencha todos os campos antes de registrar";
+    mensagem.textContent = "Preencha todos os campos e adicione códigos";
     mensagem.style.color = "red";
     return;
   }
-  const data = new Date();
-  historico.push({
-    motorista,
-    loja,
-    data: data.toLocaleDateString(),
-    hora: data.getHours() + ':' + ('0'+data.getMinutes()).slice(-2),
-    pedidos: [...listaBipagem]
+  const res = await fetch('/registrar', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({motorista, loja, pedidos: listaBipagem})
   });
-  listaBipagem = [];
-  atualizarLista();
-  mensagem.textContent = "Pedidos registrados com sucesso!";
-  mensagem.style.color = "green";
+  if (res.ok) {
+    mensagem.textContent = "Pedidos registrados!";
+    mensagem.style.color = "green";
+    listaBipagem = [];
+    atualizarLista();
+  } else {
+    mensagem.textContent = "Erro ao registrar";
+    mensagem.style.color = "red";
+  }
 }
 
-function abrirHistorico() {
-  document.getElementById('main-page').classList.add('hidden');
-  document.getElementById('historico-page').classList.remove('hidden');
-  renderHistorico();
+// Registro
+function abrirRegistro() {
+  document.getElementById('bipagem-page').classList.add('hidden');
+  document.getElementById('registro-page').classList.remove('hidden');
+  carregarRegistro();
 }
 
-function fecharHistorico() {
-  document.getElementById('historico-page').classList.add('hidden');
-  document.getElementById('main-page').classList.remove('hidden');
+function fecharRegistro() {
+  document.getElementById('registro-page').classList.add('hidden');
+  document.getElementById('bipagem-page').classList.remove('hidden');
+  document.getElementById('pedidos-detalhes').classList.add('hidden');
 }
 
-function renderHistorico() {
-  const container = document.getElementById('historico-lista');
+async function carregarRegistro() {
+  const res = await fetch('/registro');
+  const registros = await res.json();
+  const container = document.getElementById('registro-lista');
   container.innerHTML = '';
-  historico.forEach((h, index) => {
+  registros.forEach((r, index) => {
     const div = document.createElement('div');
     div.className = 'coleta-item';
-    div.innerHTML = `${h.motorista} - Loja ${h.loja} - ${h.data} ${h.hora} - ${h.pedidos.length} pedidos`;
-    div.onclick = () => mostrarPedidos(index);
+    div.textContent = `${r.motorista} - ${r.loja} - ${r.data} ${r.hora} - ${r.pedidos.length} pedidos`;
+    div.onclick = () => mostrarPedidos(r.pedidos);
     container.appendChild(div);
   });
 }
 
-function mostrarPedidos(index) {
-  const detalhes = document.getElementById('pedidos-detalhes');
+function mostrarPedidos(pedidos) {
   const lista = document.getElementById('pedidos-lista');
   lista.innerHTML = '';
-  historico[index].pedidos.forEach(p => {
+  pedidos.forEach(p => {
     const li = document.createElement('li');
     li.textContent = p;
     lista.appendChild(li);
   });
-  detalhes.classList.remove('hidden');
+  document.getElementById('pedidos-detalhes').classList.remove('hidden');
 }
 
 function copiarPedidos() {
@@ -97,26 +105,4 @@ function copiarPedidos() {
   const codigos = Array.from(lista.children).map(li => li.textContent).join('\n');
   navigator.clipboard.writeText(codigos);
   alert("Pedidos copiados!");
-}
-
-function aplicarFiltros() {
-  const motoristaFiltro = document.getElementById('filtro-motorista').value.toLowerCase();
-  const lojaFiltro = document.getElementById('filtro-loja').value.toLowerCase();
-  const dataFiltro = document.getElementById('filtro-data').value;
-
-  const container = document.getElementById('historico-lista');
-  container.innerHTML = '';
-  historico.forEach((h, index) => {
-    if (
-      (motoristaFiltro && !h.motorista.toLowerCase().includes(motoristaFiltro)) ||
-      (lojaFiltro && !h.loja.toLowerCase().includes(lojaFiltro)) ||
-      (dataFiltro && h.data !== dataFiltro)
-    ) return;
-
-    const div = document.createElement('div');
-    div.className = 'coleta-item';
-    div.innerHTML = `${h.motorista} - Loja ${h.loja} - ${h.data} ${h.hora} - ${h.pedidos.length} pedidos`;
-    div.onclick = () => mostrarPedidos(index);
-    container.appendChild(div);
-  });
 }
