@@ -1,73 +1,109 @@
-body {
-  font-family: Arial, sans-serif;
+/* Reset básico */
+* {
   margin: 0;
   padding: 0;
-  background: #fff;
-  color: #333;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
 }
 
-header {
-  background: #c00;
-  color: white;
-  text-align: center;
-  padding: 15px;
+body {
+  background-color: #fff;
+  color: #000;
+  padding: 20px;
 }
 
-h1, h2, h3 {
-  margin: 0 0 10px 0;
+/* Formulários e inputs */
+.form-group {
+  margin-bottom: 10px;
 }
 
-#form {
-  padding: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  justify-content: center;
-}
-
-input, select, button {
-  padding: 10px;
-  margin: 2px 0;
-  font-size: 16px;
-}
-
-#bipagem-atual, #historico-page {
-  padding: 10px;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li, .coleta-item {
-  background: #f9f9f9;
-  margin: 5px 0;
+input, select {
+  width: 100%;
   padding: 8px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  background-color: #c00; /* Vermelho */
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  margin: 5px 2px;
   border-radius: 5px;
   cursor: pointer;
 }
 
-.coleta-item:hover {
-  background: #eee;
+button:hover {
+  background-color: #a00;
 }
 
+.mensagem {
+  color: green;
+  margin-top: 10px;
+}
+
+/* Lista de bipagem */
+ul {
+  list-style-type: none;
+  margin-top: 10px;
+}
+
+li {
+  padding: 5px;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Ocultar elementos */
 .hidden {
   display: none;
 }
 
-button {
-  background: #c00;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #900;
-}
-
+/* Histórico e filtros */
 #historico-lista {
-  max-height: 400px;
-  overflow-y: auto;
+  margin-top: 10px;
+}
+
+#historico-lista input {
+  width: 30%;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+.coleta-item {
+  padding: 8px;
+  border: 1px solid #c00;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  background-color: #fff0f0;
+}
+
+.coleta-item:hover {
+  background-color: #ffe0e0;
+}
+
+#pedidos-detalhes button {
+  background-color: #090; /* Verde */
+  margin-top: 5px;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+
+  input, select, button {
+    font-size: 16px;
+  }
+
+  #historico-lista input {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+
+  .coleta-item {
+    font-size: 14px;
+  }
 }

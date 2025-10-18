@@ -1,7 +1,14 @@
 let bipagemAtual = [];
 
+const codigoInput = document.getElementById("codigo");
+codigoInput.addEventListener("keydown", function(event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    adicionarCodigo();
+  }
+});
+
 function adicionarCodigo() {
-  const codigoInput = document.getElementById("codigo");
   const codigo = codigoInput.value.trim();
   const msg = document.getElementById("mensagem");
 
@@ -31,7 +38,6 @@ function adicionarCodigo() {
   bipagemAtual.push({ codigo, motorista, loja });
   atualizarBipagem();
   codigoInput.value = "";
-  codigoInput.focus();
   msg.innerText = "";
 }
 
@@ -61,7 +67,7 @@ async function registrar() {
   atualizarBipagem();
 }
 
-// ---------- Histórico ----------
+// ---------------- Histórico ----------------
 async function abrirHistorico() {
   document.getElementById("main-page").classList.add("hidden");
   document.getElementById("historico-page").classList.remove("hidden");
@@ -70,7 +76,6 @@ async function abrirHistorico() {
   const dados = await resp.json();
 
   const agrupados = {};
-
   dados.forEach(item => {
     const chave = `${item.motorista}|${item.loja}|${item.data}`;
     if (!agrupados[chave]) agrupados[chave] = [];
@@ -80,27 +85,76 @@ async function abrirHistorico() {
   const historicoLista = document.getElementById("historico-lista");
   historicoLista.innerHTML = "";
 
-  for (const key in agrupados) {
-    const [motorista, loja, data] = key.split("|");
-    const quantidade = agrupados[key].length;
+  // Filtros
+  const filtroContainer = document.createElement("div");
+  filtroContainer.innerHTML = `
+    <input type="text" id="filtro-motorista" placeholder="Motorista">
+    <input type="text" id="filtro-loja" placeholder="Loja">
+    <input type="text" id="filtro-data" placeholder="Data">
+    <button onclick="aplicarFiltro()">Filtrar</button>
+  `;
+  historicoLista.appendChild(filtroContainer);
 
-    const div = document.createElement("div");
-    div.classList.add("coleta-item");
-    div.innerHTML = `<strong>${motorista}</strong> - Loja: ${loja} - ${data} - Pedidos: ${quantidade}`;
-    div.onclick = () => mostrarPedidosDetalhes(agrupados[key]);
-    historicoLista.appendChild(div);
+  function renderListaFiltrada(filtro) {
+    // Limpa itens antigos
+    const antigos = historicoLista.querySelectorAll(".coleta-item");
+    antigos.forEach(a => a.remove());
+
+    for (const key in agrupados) {
+      const [motorista, loja, data] = key.split("|");
+      const quantidade = agrupados[key].length;
+
+      if (filtro.motorista && !motorista.toLowerCase().includes(filtro.motorista.toLowerCase())) continue;
+      if (filtro.loja && !loja.includes(filtro.loja)) continue;
+      if (filtro.data && !data.includes(filtro.data)) continue;
+
+      const div = document.createElement("div");
+      div.classList.add("coleta-item");
+      div.innerHTML = `<strong>${motorista}</strong> - Loja: ${loja} - ${data} - Pedidos: ${quantidade}`;
+      div.onclick = () => mostrarPedidosDetalhes(agrupados[key]);
+      historicoLista.appendChild(div);
+    }
   }
+
+  window.aplicarFiltro = () => {
+    const filtro = {
+      motorista: document.getElementById("filtro-motorista").value,
+      loja: document.getElementById("filtro-loja").value,
+      data: document.getElementById("filtro-data").value
+    };
+    renderListaFiltrada(filtro);
+  }
+
+  // Renderiza sem filtro inicialmente
+  renderListaFiltrada({});
 }
 
 function mostrarPedidosDetalhes(codigos) {
   const detalhes = document.getElementById("pedidos-detalhes");
   const lista = document.getElementById("pedidos-lista");
   lista.innerHTML = "";
+
   codigos.forEach(c => {
     const li = document.createElement("li");
     li.textContent = c;
     lista.appendChild(li);
   });
+
+  // Botão de copiar
+  const btnCopiar = document.createElement("button");
+  btnCopiar.textContent = "📋 Copiar todos os pedidos";
+  btnCopiar.onclick = () => {
+    const texto = codigos.join("\n");
+    navigator.clipboard.writeText(texto);
+    alert("Pedidos copiados!");
+  }
+
+  // Remove antigo se existir
+  const antigo = document.getElementById("copiar-btn");
+  if (antigo) antigo.remove();
+  btnCopiar.id = "copiar-btn";
+  detalhes.appendChild(btnCopiar);
+
   detalhes.classList.remove("hidden");
 }
 
