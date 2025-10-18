@@ -48,11 +48,18 @@
   <!-- Página de histórico -->
   <div id="historico-page" class="hidden">
     <h1>Histórico de Coletas</h1>
+    <div>
+      <input type="text" id="filtro-motorista" placeholder="Filtrar por motorista">
+      <input type="text" id="filtro-loja" placeholder="Filtrar por loja">
+      <input type="date" id="filtro-data">
+      <button onclick="aplicarFiltros()">Aplicar filtros</button>
+    </div>
     <div id="historico-lista"></div>
 
     <div id="pedidos-detalhes" class="hidden">
       <h2>Pedidos da Coleta</h2>
       <ul id="pedidos-lista"></ul>
+      <button onclick="copiarPedidos()">Copiar todos os pedidos</button>
     </div>
 
     <button onclick="fecharHistorico()">Voltar</button>
