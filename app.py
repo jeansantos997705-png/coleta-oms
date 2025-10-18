@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 import io
 from datetime import datetime
-import pandas as pd
+from openpyxl import Workbook
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///coletas.db'
@@ -61,7 +61,7 @@ def detalhes(id):
     pedidos = coleta.pedidos.split(", ")
     return jsonify({"pedidos": pedidos})
 
-# 🧩 NOVO: rota para gerar backup em Excel
+# 📦 NOVO: rota de backup SEM pandas (usando openpyxl)
 @app.route('/backup', methods=['GET'])
 def backup():
     coletas = Coleta.query.order_by(Coleta.id.desc()).all()
@@ -69,25 +69,23 @@ def backup():
     if not coletas:
         return jsonify({"error": "Nenhum registro encontrado para backup"}), 404
 
-    data = []
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Coletas"
+    ws.append(["Motorista", "Loja", "Data", "Pedido"])
+
     for coleta in coletas:
         pedidos = coleta.pedidos.split(", ")
         for pedido in pedidos:
-            data.append({
-                "Motorista": coleta.motorista,
-                "Loja": coleta.loja,
-                "Data": coleta.data,
-                "Pedido": pedido
-            })
-
-    df = pd.DataFrame(data)
+            ws.append([coleta.motorista, coleta.loja, coleta.data, pedido])
 
     output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-        df.to_excel(writer, index=False, sheet_name='Coletas')
-
+    wb.save(output)
     output.seek(0)
-    return send_file(output, as_attachment=True, download_name="backup_coletas.xlsx", mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+    nome_arquivo = f"backup_coletas_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.xlsx"
+
+    return send_file(output, as_attachment=True, download_name=nome_arquivo, mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
