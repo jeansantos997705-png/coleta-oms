@@ -5,7 +5,7 @@ import os
 
 app = Flask(__name__)
 
-# Banco de dados local (SQLite)
+# Banco de dados local SQLite
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///coletas.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -17,6 +17,7 @@ class Coleta(db.Model):
     loja = db.Column(db.String(100), nullable=False)
     data = db.Column(db.String(20), nullable=False)
     pedidos = db.Column(db.Text, nullable=False)
+
 
 with app.app_context():
     db.create_all()
@@ -53,12 +54,7 @@ def salvar():
 def historico():
     coletas = Coleta.query.order_by(Coleta.id.desc()).all()
     registros = [
-        {
-            "id": c.id,
-            "motorista": c.motorista,
-            "loja": c.loja,
-            "data": c.data
-        }
+        {"id": c.id, "motorista": c.motorista, "loja": c.loja, "data": c.data}
         for c in coletas
     ]
     return jsonify(registros)
