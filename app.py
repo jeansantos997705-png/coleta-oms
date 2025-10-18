@@ -5,7 +5,7 @@ import os
 
 app = Flask(__name__)
 
-# Banco de dados local SQLite
+# Banco de dados local (SQLite)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///coletas.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)

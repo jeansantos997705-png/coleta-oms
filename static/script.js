@@ -1,5 +1,5 @@
 const codigoInput = document.getElementById("codigo");
-const motoristaInput = document.getElementById("motorista");
+const motoristaSelect = document.getElementById("motorista");
 const lojaInput = document.getElementById("loja");
 const lista = document.getElementById("lista");
 const contador = document.getElementById("contador");
@@ -13,6 +13,7 @@ const listaHistorico = document.getElementById("listaHistorico");
 
 let pedidos = [];
 
+// valida e atualiza UI
 function atualizarLista() {
     lista.innerHTML = "";
     pedidos.forEach(p => {
@@ -23,6 +24,7 @@ function atualizarLista() {
     contador.textContent = pedidos.length;
 }
 
+// adicionar pedido (usado por botão e Enter)
 function adicionarPedido() {
     const codigo = codigoInput.value.trim();
     if (codigo.length !== 12) {
@@ -38,16 +40,18 @@ function adicionarPedido() {
     atualizarLista();
 }
 
+// Enter para adicionar
 codigoInput.addEventListener("keypress", e => {
     if (e.key === "Enter") {
+        e.preventDefault();
         adicionarPedido();
     }
 });
-
 adicionarBtn.addEventListener("click", adicionarPedido);
 
+// registrar no servidor
 registrarBtn.addEventListener("click", async () => {
-    const motorista = motoristaInput.value.trim();
+    const motorista = motoristaSelect.value.trim();
     const loja = lojaInput.value.trim();
 
     if (!motorista || !loja || pedidos.length === 0) {
@@ -61,12 +65,19 @@ registrarBtn.addEventListener("click", async () => {
         body: JSON.stringify({ motorista, loja, pedidos })
     });
 
+    if (!resposta.ok) {
+        const txt = await resposta.text();
+        alert("Erro ao salvar: " + txt);
+        return;
+    }
+
     const data = await resposta.json();
-    alert(data.mensagem || "Erro ao salvar!");
+    alert(data.mensagem || "Salvo com sucesso!");
     pedidos = [];
     atualizarLista();
 });
 
+// histórico
 historicoBtn.addEventListener("click", async () => {
     bipagem.classList.add("oculto");
     historico.classList.remove("oculto");
@@ -97,17 +108,20 @@ async function abrirDetalhes(id) {
         <h3>${detalhes.motorista} - ${detalhes.loja}</h3>
         <p>${detalhes.data}</p>
         <ul>${detalhes.pedidos.map(p => `<li>${p}</li>`).join('')}</ul>
-        <button onclick="copiarPedidos(${id})">📋 Copiar todos</button>
+        <button id="copiarBtn">📋 Copiar todos</button>
         <button id="voltarHistorico">⬅️ Voltar</button>
     `;
 
-    document.getElementById("voltarHistorico").onclick = () => historicoBtn.click();
-}
+    document.getElementById("copiarBtn").onclick = async () => {
+        const resp = await fetch(`/historico/${id}`);
+        const d = await resp.json();
+        const texto = d.pedidos.join("\n");
+        navigator.clipboard.writeText(texto);
+        alert("Pedidos copiados!");
+    };
 
-async function copiarPedidos(id) {
-    const resposta = await fetch(`/historico/${id}`);
-    const detalhes = await resposta.json();
-    const texto = detalhes.pedidos.join("\n");
-    navigator.clipboard.writeText(texto);
-    alert("Pedidos copiados!");
+    document.getElementById("voltarHistorico").onclick = () => {
+        // reload histórico list
+        historicoBtn.click();
+    };
 }
