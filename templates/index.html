@@ -1,68 +1,43 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Coleta OMS</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Coleta</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <!-- Página de bipagem -->
-  <div id="bipagem-page">
-    <header>
-      <h1>Coleta de Pedidos</h1>
-      <button id="btn-registro" onclick="abrirRegistro()">Registro</button>
-    </header>
+    <div id="app">
+        <header>
+            <h2>Controle de Coleta</h2>
+            <button id="btnHistorico">📋 Registro</button>
+        </header>
 
-    <div class="form-group">
-      <label for="motorista">Motorista:</label>
-      <select id="motorista">
-        <option value="">Selecione</option>
-        <option>Silenildo</option>
-        <option>Adryen</option>
-        <option>Priscila</option>
-        <option>Uelber</option>
-        <option>Luiz Carlos</option>
-        <option>Luis Gerson</option>
-        <option>Marcio</option>
-        <option>Dayveson</option>
-        <option>Dalvan</option>
-      </select>
+        <main id="bipagem">
+            <label>Motorista:</label>
+            <input type="text" id="motorista" placeholder="Digite o nome do motorista">
+
+            <label>Loja:</label>
+            <input type="text" id="loja" placeholder="Digite o nome da loja">
+
+            <label>Código do Pedido:</label>
+            <input type="text" id="codigo" placeholder="Bipe ou digite o código">
+
+            <button id="adicionar">Adicionar</button>
+
+            <h3>Pedidos Bipados: <span id="contador">0</span></h3>
+            <ul id="lista"></ul>
+
+            <button id="registrar">Registrar Coleta</button>
+        </main>
+
+        <section id="historico" class="oculto">
+            <h2>Histórico de Coletas</h2>
+            <div id="listaHistorico"></div>
+            <button id="voltar">⬅️ Voltar</button>
+        </section>
     </div>
 
-    <div class="form-group">
-      <label for="loja">Loja:</label>
-      <input type="text" id="loja" placeholder="Número da loja">
-    </div>
-
-    <div class="form-group">
-      <label for="codigo">Código do pedido:</label>
-      <input type="text" id="codigo" placeholder="Ex: 123456789-12">
-    </div>
-
-    <button onclick="adicionarCodigo()">Adicionar</button>
-    <span id="contador">0</span> pedidos adicionados
-    <p id="mensagem" class="mensagem"></p>
-
-    <ul id="lista-bipagem"></ul>
-    <button onclick="registrar()">Enviar para o sistema</button>
-  </div>
-
-  <!-- Página de registro -->
-  <div id="registro-page" class="hidden">
-    <header>
-      <h1>Registro de Coletas</h1>
-      <button onclick="fecharRegistro()">Voltar</button>
-    </header>
-    <div id="registro-lista"></div>
-
-    <div id="pedidos-detalhes" class="hidden">
-      <h2>Pedidos da Coleta</h2>
-      <ul id="pedidos-lista"></ul>
-      <button onclick="copiarPedidos()">Copiar todos os pedidos</button>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
+    <script src="/static/script.js"></script>
 </body>
 </html>

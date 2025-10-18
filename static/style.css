@@ -1,13 +1,14 @@
-* {
+body {
+  font-family: Arial, sans-serif;
+  background-color: #fff;
+  color: #222;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
 }
 
-body {
-  background-color: #fff;
-  color: #000;
+#app {
+  max-width: 480px;
+  margin: auto;
   padding: 15px;
 }
 
@@ -15,81 +16,66 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  background-color: #c62828;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
 }
 
-h1 {
-  font-size: 1.5em;
+header h2 {
+  font-size: 18px;
 }
 
 button {
-  background-color: #c00;
-  color: #fff;
+  background-color: #c62828;
+  color: white;
   border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: bold;
   cursor: pointer;
+  margin-top: 10px;
+  width: 100%;
 }
 
 button:hover {
-  background-color: #a00;
+  background-color: #a81e1e;
 }
 
-input, select {
+input {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   margin: 5px 0;
-  border-radius: 5px;
+  border-radius: 6px;
   border: 1px solid #ccc;
 }
 
 ul {
-  list-style-type: none;
-  margin-top: 10px;
+  list-style: none;
+  padding: 0;
 }
 
-li {
-  padding: 5px;
-  border-bottom: 1px solid #ccc;
+ul li {
+  background-color: #f3f3f3;
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 5px;
 }
 
-.mensagem {
-  margin-top: 5px;
-  color: green;
-}
-
-.hidden {
+.oculto {
   display: none;
 }
 
-.coleta-item {
+#historico {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+#listaHistorico div {
+  background-color: #f8f8f8;
+  margin: 8px 0;
   padding: 8px;
-  border: 1px solid #c00;
-  border-radius: 5px;
-  margin-bottom: 5px;
+  border-radius: 6px;
   cursor: pointer;
-  background-color: #fff0f0;
-}
-
-.coleta-item:hover {
-  background-color: #ffe0e0;
-}
-
-#pedidos-detalhes button {
-  background-color: #090;
-  margin-top: 5px;
-}
-
-@media (max-width: 600px) {
-  body {
-    padding: 10px;
-  }
-
-  input, select, button {
-    font-size: 16px;
-  }
-
-  .coleta-item {
-    font-size: 14px;
-  }
 }

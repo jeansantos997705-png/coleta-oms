@@ -1,108 +1,113 @@
-let listaBipagem = [];
-const listaUl = document.getElementById('lista-bipagem');
-const contador = document.getElementById('contador');
-const mensagem = document.getElementById('mensagem');
+const codigoInput = document.getElementById("codigo");
+const motoristaInput = document.getElementById("motorista");
+const lojaInput = document.getElementById("loja");
+const lista = document.getElementById("lista");
+const contador = document.getElementById("contador");
+const registrarBtn = document.getElementById("registrar");
+const adicionarBtn = document.getElementById("adicionar");
+const historicoBtn = document.getElementById("btnHistorico");
+const voltarBtn = document.getElementById("voltar");
+const bipagem = document.getElementById("bipagem");
+const historico = document.getElementById("historico");
+const listaHistorico = document.getElementById("listaHistorico");
 
-const codigoInput = document.getElementById('codigo');
-codigoInput.addEventListener('keypress', function(e) {
-  if (e.key === 'Enter') {
-    adicionarCodigo();
-  }
-});
-
-function adicionarCodigo() {
-  const codigo = codigoInput.value.trim();
-  if (!/^.{12}$/.test(codigo)) {
-    mensagem.textContent = "Código inválido";
-    mensagem.style.color = "red";
-    return;
-  }
-  if (listaBipagem.includes(codigo)) {
-    mensagem.textContent = "Código duplicado";
-    mensagem.style.color = "red";
-    return;
-  }
-  listaBipagem.push(codigo);
-  atualizarLista();
-  codigoInput.value = '';
-  mensagem.textContent = '';
-}
+let pedidos = [];
 
 function atualizarLista() {
-  listaUl.innerHTML = '';
-  listaBipagem.forEach(c => {
-    const li = document.createElement('li');
-    li.textContent = c;
-    listaUl.appendChild(li);
-  });
-  contador.textContent = listaBipagem.length;
+    lista.innerHTML = "";
+    pedidos.forEach(p => {
+        const li = document.createElement("li");
+        li.textContent = p;
+        lista.appendChild(li);
+    });
+    contador.textContent = pedidos.length;
 }
 
-async function registrar() {
-  const motorista = document.getElementById('motorista').value;
-  const loja = document.getElementById('loja').value;
-  if (!motorista || !loja || listaBipagem.length === 0) {
-    mensagem.textContent = "Preencha todos os campos e adicione códigos";
-    mensagem.style.color = "red";
-    return;
-  }
-  const res = await fetch('/registrar', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({motorista, loja, pedidos: listaBipagem})
-  });
-  if (res.ok) {
-    mensagem.textContent = "Pedidos registrados!";
-    mensagem.style.color = "green";
-    listaBipagem = [];
+function adicionarPedido() {
+    const codigo = codigoInput.value.trim();
+    if (codigo.length !== 12) {
+        alert("O código deve ter 12 caracteres!");
+        return;
+    }
+    if (pedidos.includes(codigo)) {
+        alert("Pedido duplicado!");
+        return;
+    }
+    pedidos.push(codigo);
+    codigoInput.value = "";
     atualizarLista();
-  } else {
-    mensagem.textContent = "Erro ao registrar";
-    mensagem.style.color = "red";
-  }
 }
 
-// Registro
-function abrirRegistro() {
-  document.getElementById('bipagem-page').classList.add('hidden');
-  document.getElementById('registro-page').classList.remove('hidden');
-  carregarRegistro();
+codigoInput.addEventListener("keypress", e => {
+    if (e.key === "Enter") {
+        adicionarPedido();
+    }
+});
+
+adicionarBtn.addEventListener("click", adicionarPedido);
+
+registrarBtn.addEventListener("click", async () => {
+    const motorista = motoristaInput.value.trim();
+    const loja = lojaInput.value.trim();
+
+    if (!motorista || !loja || pedidos.length === 0) {
+        alert("Preencha todos os campos e adicione pedidos!");
+        return;
+    }
+
+    const resposta = await fetch("/salvar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ motorista, loja, pedidos })
+    });
+
+    const data = await resposta.json();
+    alert(data.mensagem || "Erro ao salvar!");
+    pedidos = [];
+    atualizarLista();
+});
+
+historicoBtn.addEventListener("click", async () => {
+    bipagem.classList.add("oculto");
+    historico.classList.remove("oculto");
+    listaHistorico.innerHTML = "<p>Carregando...</p>";
+
+    const resposta = await fetch("/historico");
+    const registros = await resposta.json();
+
+    listaHistorico.innerHTML = "";
+    registros.forEach(r => {
+        const div = document.createElement("div");
+        div.innerHTML = `<b>${r.motorista}</b> - ${r.loja}<br><small>${r.data}</small>`;
+        div.onclick = () => abrirDetalhes(r.id);
+        listaHistorico.appendChild(div);
+    });
+});
+
+voltarBtn.addEventListener("click", () => {
+    historico.classList.add("oculto");
+    bipagem.classList.remove("oculto");
+});
+
+async function abrirDetalhes(id) {
+    const resposta = await fetch(`/historico/${id}`);
+    const detalhes = await resposta.json();
+
+    listaHistorico.innerHTML = `
+        <h3>${detalhes.motorista} - ${detalhes.loja}</h3>
+        <p>${detalhes.data}</p>
+        <ul>${detalhes.pedidos.map(p => `<li>${p}</li>`).join('')}</ul>
+        <button onclick="copiarPedidos(${id})">📋 Copiar todos</button>
+        <button id="voltarHistorico">⬅️ Voltar</button>
+    `;
+
+    document.getElementById("voltarHistorico").onclick = () => historicoBtn.click();
 }
 
-function fecharRegistro() {
-  document.getElementById('registro-page').classList.add('hidden');
-  document.getElementById('bipagem-page').classList.remove('hidden');
-  document.getElementById('pedidos-detalhes').classList.add('hidden');
-}
-
-async function carregarRegistro() {
-  const res = await fetch('/registro');
-  const registros = await res.json();
-  const container = document.getElementById('registro-lista');
-  container.innerHTML = '';
-  registros.forEach((r, index) => {
-    const div = document.createElement('div');
-    div.className = 'coleta-item';
-    div.textContent = `${r.motorista} - ${r.loja} - ${r.data} ${r.hora} - ${r.pedidos.length} pedidos`;
-    div.onclick = () => mostrarPedidos(r.pedidos);
-    container.appendChild(div);
-  });
-}
-
-function mostrarPedidos(pedidos) {
-  const lista = document.getElementById('pedidos-lista');
-  lista.innerHTML = '';
-  pedidos.forEach(p => {
-    const li = document.createElement('li');
-    li.textContent = p;
-    lista.appendChild(li);
-  });
-  document.getElementById('pedidos-detalhes').classList.remove('hidden');
-}
-
-function copiarPedidos() {
-  const lista = document.getElementById('pedidos-lista');
-  const codigos = Array.from(lista.children).map(li => li.textContent).join('\n');
-  navigator.clipboard.writeText(codigos);
-  alert("Pedidos copiados!");
+async function copiarPedidos(id) {
+    const resposta = await fetch(`/historico/${id}`);
+    const detalhes = await resposta.json();
+    const texto = detalhes.pedidos.join("\n");
+    navigator.clipboard.writeText(texto);
+    alert("Pedidos copiados!");
 }
