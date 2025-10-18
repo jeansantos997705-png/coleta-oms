@@ -1,54 +1,49 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Coleta</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
-    <div id="app">
-        <header>
-            <h2>Controle de Coleta</h2>
-            <button id="btnHistorico">📋 Registro</button>
-        </header>
+    <div class="container">
+        <h1>Controle de Coleta</h1>
 
-        <main id="bipagem">
-            <label>Motorista:</label>
+        <div id="bipagem">
             <select id="motorista">
                 <option value="">Selecione o motorista</option>
-                <option value="Silenildo">Silenildo</option>
-                <option value="Adryen">Adryen</option>
-                <option value="Priscila">Priscila</option>
-                <option value="Uelber">Uelber</option>
-                <option value="Luiz Carlos">Luiz Carlos</option>
-                <option value="Luis Gerson">Luis Gerson</option>
-                <option value="Marcio">Marcio</option>
-                <option value="Dayveson">Dayveson</option>
-                <option value="Dalvan">Dalvan</option>
+                <option>Adryen</option>
+                <option>Uelber</option>
+                <option>Luiz Carlos</option>
+                <option>Luis Gerson</option>
+                <option>Priscila</option>
+                <option>Dayveson</option>
+                <option>Silenildo</option>
+                <option>Dalvan</option>
+                <option>Marcio</option>
             </select>
-
-            <label>Loja:</label>
-            <input type="text" id="loja" placeholder="Digite o nome da loja">
-
-            <label>Código do Pedido:</label>
-            <input type="text" id="codigo" placeholder="Bipe ou digite o código">
-
+            <input type="text" id="loja" placeholder="Loja">
+            <input type="text" id="pedido" placeholder="Pedido">
             <button id="adicionar">Adicionar</button>
-
-            <h3>Pedidos Bipados: <span id="contador">0</span></h3>
+            <p>Total bipado: <span id="contador">0</span></p>
             <ul id="lista"></ul>
-
             <button id="registrar">Registrar Coleta</button>
-        </main>
+        </div>
 
-        <section id="historico" class="oculto">
+        <!-- MENU -->
+        <div class="menu">
+            <button id="abrirMenu">📋 Registro</button>
+        </div>
+
+        <div id="paginaHistorico" class="hidden">
             <h2>Histórico de Coletas</h2>
-            <div id="listaHistorico"></div>
             <button id="voltar">⬅️ Voltar</button>
-        </section>
+            <button id="backup">📦 Backup</button>
+            <ul id="historico"></ul>
+        </div>
     </div>
 
-    <script src="/static/script.js"></script>
+    <script src="static/script.js"></script>
 </body>
 </html>
