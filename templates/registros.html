@@ -19,7 +19,7 @@
         <div class="registro-lista">
             {% if registros %}
                 {% for i, r in enumerate(registros) %}
-                    <div class="registro-item" onclick="abrirPedidos({{ i | safe }})">
+                    <div class="registro-item" onclick="abrirPedidos('{{ i }}')">
                         <p><b>Motorista:</b> {{ r.motorista }}</p>
                         <p><b>Loja:</b> {{ r.loja }}</p>
                         <p><b>Data:</b> {{ r.data }}</p>
