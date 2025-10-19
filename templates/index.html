@@ -1,22 +1,21 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Coletas</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <header>
         <h1>Controle de Coletas</h1>
-        <button id="btnRegistros">Registros</button>
+        <button id="btnRegistros" onclick="window.location.href='/registros'">📜 Registros</button>
     </header>
 
-    <main id="paginaColeta">
-        <section class="card">
-            <label>Motorista:</label>
+    <main>
+        <div class="form-container">
             <select id="motorista">
-                <option value="">Selecione...</option>
+                <option value="">Selecione o Motorista</option>
                 <option>Adryen</option>
                 <option>Uelber</option>
                 <option>Luiz Carlos</option>
@@ -28,36 +27,17 @@
                 <option>Marcio</option>
             </select>
 
-            <label>Loja:</label>
             <input type="text" id="loja" placeholder="Loja">
+            <input type="text" id="pedido" placeholder="Pedido" maxlength="12">
+            <button id="addBtn" onclick="adicionarPedido()">Adicionar</button>
 
-            <label>Código do Pedido:</label>
-            <input type="text" id="pedido" placeholder="Pedido">
-
-            <button id="adicionar">Adicionar</button>
-
-            <div id="contador">Pedidos: 0</div>
+            <p id="contador">Pedidos: 0</p>
+            <button id="enviarBtn" onclick="enviar()">Enviar para o sistema</button>
 
             <ul id="listaPedidos"></ul>
-
-            <button id="enviar">Enviar para o sistema</button>
-        </section>
+        </div>
     </main>
 
-    <main id="paginaRegistros" class="oculto">
-        <section class="card">
-            <h2>Registros de Coletas</h2>
-            <button id="btnVoltar">← Voltar</button>
-            <button id="btnBackup">📦 Backup</button>
-            <ul id="listaRegistros"></ul>
-            <div id="detalhes" class="oculto">
-                <h3>Pedidos dessa Coleta</h3>
-                <ul id="listaDetalhes"></ul>
-                <button id="copiarPedidos">Copiar Todos</button>
-            </div>
-        </section>
-    </main>
-
-    <script src="script.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

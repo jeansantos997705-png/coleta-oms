@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registros de Coletas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Registros de Coletas</h1>
+        <div>
+            <button onclick="window.location.href='/'">⬅ Voltar</button>
+            <button onclick="window.location.href='/backup'">💾 Backup</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="registro-lista">
+            {% if registros %}
+                {% for i, r in enumerate(registros) %}
+                    <div class="registro-item" onclick="abrirPedidos({{ i | safe }})">
+                        <p><b>Motorista:</b> {{ r.motorista }}</p>
+                        <p><b>Loja:</b> {{ r.loja }}</p>
+                        <p><b>Data:</b> {{ r.data }}</p>
+                        <p><b>Pedidos:</b> {{ r.pedidos|length }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>Nenhum registro encontrado.</p>
+            {% endif %}
+        </div>
+
+        <div id="pedidosContainer" class="pedidos-container" style="display:none;">
+            <h2>Pedidos dessa Coleta</h2>
+            <ul id="listaPedidosRegistro"></ul>
+            <button id="copiarBtn" onclick="copiarPedidos()">📋 Copiar Todos</button>
+        </div>
+    </main>
+
+    <script>
+        async function abrirPedidos(indice) {
+            const response = await fetch(`/pedidos/${indice}`);
+            const pedidos = await response.json();
+
+            const lista = document.getElementById("listaPedidosRegistro");
+            lista.innerHTML = "";
+            pedidos.forEach(p => {
+                const li = document.createElement("li");
+                li.textContent = p;
+                lista.appendChild(li);
+            });
+
+            document.getElementById("pedidosContainer").style.display = "block";
+        }
+
+        function copiarPedidos() {
+            const pedidos = [...document.querySelectorAll("#listaPedidosRegistro li")]
+                .map(li => li.textContent)
+                .join("\n");
+            navigator.clipboard.writeText(pedidos)
+                .then(() => alert("Pedidos copiados com sucesso!"))
+                .catch(() => alert("Erro ao copiar pedidos."));
+        }
+    </script>
+</body>
+</html>
