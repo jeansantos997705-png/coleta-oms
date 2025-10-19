@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Coleta</title>
-    <link rel="stylesheet" href="static/style.css">
+    <title>Controle de Coletas</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Controle de Coleta</h1>
+    <header>
+        <h1>Controle de Coletas</h1>
+        <button id="btnRegistros">Registros</button>
+    </header>
 
-        <div id="bipagem">
+    <main id="paginaColeta">
+        <section class="card">
+            <label>Motorista:</label>
             <select id="motorista">
-                <option value="">Selecione o motorista</option>
+                <option value="">Selecione...</option>
                 <option>Adryen</option>
                 <option>Uelber</option>
                 <option>Luiz Carlos</option>
@@ -23,27 +27,37 @@
                 <option>Dalvan</option>
                 <option>Marcio</option>
             </select>
+
+            <label>Loja:</label>
             <input type="text" id="loja" placeholder="Loja">
+
+            <label>Código do Pedido:</label>
             <input type="text" id="pedido" placeholder="Pedido">
+
             <button id="adicionar">Adicionar</button>
-            <p>Total bipado: <span id="contador">0</span></p>
-            <ul id="lista"></ul>
-            <button id="registrar">Registrar Coleta</button>
-        </div>
 
-        <!-- MENU -->
-        <div class="menu">
-            <button id="abrirMenu">📋 Registro</button>
-        </div>
+            <div id="contador">Pedidos: 0</div>
 
-        <div id="paginaHistorico" class="hidden">
-            <h2>Histórico de Coletas</h2>
-            <button id="voltar">⬅️ Voltar</button>
-            <button id="backup">📦 Backup</button>
-            <ul id="historico"></ul>
-        </div>
-    </div>
+            <ul id="listaPedidos"></ul>
 
-    <script src="static/script.js"></script>
+            <button id="enviar">Enviar para o sistema</button>
+        </section>
+    </main>
+
+    <main id="paginaRegistros" class="oculto">
+        <section class="card">
+            <h2>Registros de Coletas</h2>
+            <button id="btnVoltar">← Voltar</button>
+            <button id="btnBackup">📦 Backup</button>
+            <ul id="listaRegistros"></ul>
+            <div id="detalhes" class="oculto">
+                <h3>Pedidos dessa Coleta</h3>
+                <ul id="listaDetalhes"></ul>
+                <button id="copiarPedidos">Copiar Todos</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
 </body>
 </html>

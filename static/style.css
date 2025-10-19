@@ -1,81 +1,101 @@
 body {
-  font-family: Arial, sans-serif;
-  background-color: #fff;
-  color: #222;
-  margin: 0;
-  padding: 0;
-}
-
-#app {
-  max-width: 480px;
-  margin: auto;
-  padding: 15px;
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    color: #222;
+    margin: 0;
+    padding: 0;
+    text-align: center;
 }
 
 header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #c62828;
-  color: white;
-  padding: 10px 15px;
-  border-radius: 8px;
+    background-color: #c40000;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-header h2 {
-  font-size: 18px;
+header h1 {
+    font-size: 1.2rem;
 }
 
-button {
-  background-color: #c62828;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 10px;
-  width: 100%;
+header button {
+    background: white;
+    color: #c40000;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: bold;
 }
 
-button:hover {
-  background-color: #a81e1e;
+.card {
+    background: #f8f8f8;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 15px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
 }
 
 input, select {
-  width: 100%;
-  padding: 10px;
-  margin: 5px 0;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+    width: 90%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+button {
+    margin-top: 10px;
+    background-color: #c40000;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+#contador {
+    font-size: 1.1rem;
+    color: #c40000;
+    margin-top: 15px;
 }
 
 ul {
-  list-style: none;
-  padding: 0;
+    list-style: none;
+    padding: 0;
 }
 
-ul li {
-  background-color: #f3f3f3;
-  margin: 5px 0;
-  padding: 10px;
-  border-radius: 5px;
+li {
+    background: white;
+    margin: 5px 0;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
 }
 
 .oculto {
-  display: none;
+    display: none;
 }
 
-#historico {
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 10px;
-}
+@media (max-width: 600px) {
+    header {
+        flex-direction: column;
+        gap: 10px;
+    }
 
-#listaHistorico div {
-  background-color: #f8f8f8;
-  margin: 8px 0;
-  padding: 8px;
-  border-radius: 6px;
-  cursor: pointer;
+    input, select {
+        width: 100%;
+    }
+
+    .card {
+        margin: 10px;
+        padding: 15px;
+    }
 }

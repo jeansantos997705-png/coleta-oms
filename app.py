@@ -32,7 +32,7 @@ def registrar():
     motorista = data.get('motorista')
     loja = data.get('loja')
     pedidos = ', '.join(data.get('pedidos', []))
-    data_atual = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    data_atual = datetime.now().strftime("%d/%m/%Y")
 
     nova_coleta = Coleta(motorista=motorista, loja=loja, data=data_atual, pedidos=pedidos)
     db.session.add(nova_coleta)
@@ -49,7 +49,8 @@ def historico():
             "id": coleta.id,
             "motorista": coleta.motorista,
             "loja": coleta.loja,
-            "data": coleta.data
+            "data": coleta.data,
+            "quantidade": len(coleta.pedidos.split(", ")) if coleta.pedidos else 0
         })
     return jsonify(registros)
 
@@ -61,11 +62,9 @@ def detalhes(id):
     pedidos = coleta.pedidos.split(", ")
     return jsonify({"pedidos": pedidos})
 
-# 📦 NOVO: rota de backup SEM pandas (usando openpyxl)
 @app.route('/backup', methods=['GET'])
 def backup():
     coletas = Coleta.query.order_by(Coleta.id.desc()).all()
-
     if not coletas:
         return jsonify({"error": "Nenhum registro encontrado para backup"}), 404
 
